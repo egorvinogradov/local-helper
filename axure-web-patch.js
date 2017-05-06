@@ -31,10 +31,5 @@ function replaceRetinaImages(){
 if ( detectAxurePrototype() ) {
   appendMetaViewport();
   appendCSS();
-  if (chrome.extension) {
-    replaceRetinaImages();
-  }
-  else {
-    document.addEventListener('DOMContentLoaded', replaceRetinaImages, false);
-  }
+  replaceRetinaImages();
 }

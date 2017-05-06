@@ -10,6 +10,10 @@
       "matches": ["https://www.google.com/*"]
     },
     {
+      "js": ["icons8-copy-svg.js"],
+      "matches": ["https://icons8.com/*"]
+    },
+    {
       "js": ["axure-web-patch.js"],
       "matches": ["http://127.0.0.1/*"]
     }
