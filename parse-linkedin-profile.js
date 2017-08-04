@@ -2,37 +2,96 @@
  * Parses general Linkedin profile data and generates a string to fill out Google Spreadsheets row
  * Usage from Chrome JS console:
  * 
- * 1. Parse profile and copy Google Spreadsheets value string:
- * _d = _parseLinkedinProfile(); copy(_d.spreadsheetValueString);
+ * Copy Google Spreadsheets value string:
+ * o()
  * 
- * 2. Copy person name:
- * copy(_d.name);
+ * Copy profile name:
+ * p()
  *
  */
 
-function _parseLinkedinProfile() {
-  var profile = {};
+
+
+var isInitialized = false;
+
+
+function init(){
+  if (!isInitialized) {
+    expandContacts();
+    window.profile = parseProfile();
+    window.spreadsheetString = generateSpreadsheetString(profile);
+    isInitialized = true;
+  }
+};
+
+
+function o(){
+  init();
+  copy(window.spreadsheetString);
+}
+
+
+function p(){
+  init();
+  copy(profile.name);
+}
+
+
+function contains(selector, text) {
+  var elements = document.querySelectorAll(selector);
+  return Array.prototype.filter.call(elements, function(element){
+    return RegExp(text).test(element.textContent);
+  });
+}
+
+
+function expandContacts(){
+  document.querySelector('.contact-see-more-less').click();
+}
+
+
+function getContactValue(label){
+  try {
+    return contains('.pv-contact-info__header', label)[0].nextElementSibling.innerText.trim();
+  }
+  catch(e){
+    return '';
+  }
+}
+
+
+function parseProfile() {
+
+  var profile = {
+    name: '',
+    company: '',
+    linkedin: '',
+    email: '',
+    skype: '',
+    phone: '',
+  };
 
   profile.linkedin = location.href;
+  profile.company = document.querySelector('.pv-top-card-section__company').innerText.trim();
+  profile.name = document.querySelector('.pv-top-card-section__name').innerText.trim();  
 
-  profile.email = $('.pv-contact-info__header:contains("Email")').next().text().trim() || '';
+  profile.email = getContactValue('Email');
 
-  profile.skype = $('.pv-contact-info__header:contains("IM")').next().text().trim() || '';
+  profile.skype = getContactValue('IM');
   if (profile.skype.indexOf('Skype') > -1) {
     profile.skype = profile.skype.split(' (')[0];
   }
 
-  profile.phone = $('.pv-contact-info__header:contains("Phone")').next().text().trim() || '';
+  profile.phone = getContactValue('Phone');
   if (profile.phone) {
     profile.phone = profile.phone.split(' (')[0].replace('+', '').replace(/\s/g, '');
     profile.phone = profile.phone[0] + ' ' + profile.phone.slice(1, 4) + ' ' + profile.phone.slice(4);
   }
 
-  profile.company = $('.pv-top-card-section__company').text().trim();
-
-  profile.name = $('.pv-top-card-section__name').text().trim();
-
-  profile.spreadsheetValueString = `M,${profile.company},,Not contacted yet,,,Friend,${profile.email},${profile.phone},,${profile.linkedin},${profile.skype}`;
-
   return profile;
+}
+
+
+function generateSpreadsheetString(profile){
+  return `M,${profile.company},,Not contacted yet,,,Friend,${profile.email},${profile.phone},,${profile.linkedin},${profile.skype}`;
 }
