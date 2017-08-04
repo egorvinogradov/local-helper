@@ -84,9 +84,11 @@ function parseProfile() {
 
   profile.phone = getContactValue('Phone');
   if (profile.phone) {
-    profile.phone = profile.phone.split(' (')[0].replace('+', '').replace(/\s/g, '');
+    profile.phone = profile.phone.split(/\s+\([^0-9]/)[0].replace('+', '').replace(/\s/g, '');
     profile.phone = profile.phone[0] + ' ' + profile.phone.slice(1, 4) + ' ' + profile.phone.slice(4);
   }
+
+
 
   return profile;
 }
