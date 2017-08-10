@@ -37,6 +37,12 @@ function p(){
 }
 
 
+function i(){
+  init();
+  copy(getProfilePictureCode());
+}
+
+
 function contains(selector, text) {
   var elements = document.querySelectorAll(selector);
   return Array.prototype.filter.call(elements, function(element){
@@ -88,12 +94,16 @@ function parseProfile() {
     profile.phone = profile.phone[0] + ' ' + profile.phone.slice(1, 4) + ' ' + profile.phone.slice(4);
   }
 
-
-
   return profile;
 }
 
 
 function generateSpreadsheetString(profile){
   return `M,${profile.company},,Not contacted yet,,,Friend,${profile.email},${profile.phone},,${profile.linkedin},${profile.skype}`;
+}
+
+
+function getProfilePictureCode(){
+  var url = document.querySelector('.pv-top-card-section__image').src;
+  return `=image("${url}")`;
 }
