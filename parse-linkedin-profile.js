@@ -99,7 +99,7 @@ function parseProfile() {
 
 
 function generateSpreadsheetString(profile){
-  return `M,${profile.company},,Not contacted yet,,,Friend,${profile.email},${profile.phone},,${profile.linkedin},${profile.skype}`;
+  return `M,${profile.company},,Not contacted yet,,,No Intro,${profile.email},${profile.phone},,${profile.linkedin},${profile.skype}`;
 }
 
 
