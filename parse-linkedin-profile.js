@@ -81,7 +81,7 @@ function parseProfile() {
   };
 
   profile.linkedin = location.href;
-  profile.company = document.querySelector('.pv-top-card-section__company').innerText.trim();
+  profile.company = document.querySelector('.pv-top-card-section__company').innerText.trim().replace(/,/g, '');
   profile.name = document.querySelector('.pv-top-card-section__name').innerText.trim();  
 
   profile.email = getContactValue('Email');
