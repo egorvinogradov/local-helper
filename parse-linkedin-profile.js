@@ -25,21 +25,24 @@ function init(){
 };
 
 
-function o(){
-  init();
-  copy(window.spreadsheetString);
-}
-
-
-function p(){
-  init();
-  copy(profile.name);
-}
-
-
+// Copy photo
 function i(){
   init();
   copy(getProfilePictureCode());
+}
+
+
+// Copy name link
+function o(){
+  init();
+  copy(getProfileNameLinkCode());
+}
+
+
+// Copy spreadsheet data srting
+function p(){
+  init();
+  copy(window.spreadsheetString);
 }
 
 
@@ -107,3 +110,11 @@ function getProfilePictureCode(){
   var url = document.querySelector('.pv-top-card-section__image').src;
   return `=image("${url}")`;
 }
+
+
+function getProfileNameLinkCode(){
+  var url = location.href;
+  var name = document.querySelector('.pv-top-card-section__name').innerText.trim();
+  return `=HYPERLINK("${url}", "${name}")`;
+}
+
