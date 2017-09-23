@@ -26,7 +26,7 @@ function createHistoryLinkElement(domain){
     style: LINK_STYLE
   });
   historyLinkElement.addEventListener('click', function(e){
-    chrome.runtime.sendMessage({action: 'openTab', zzz: '2222', url: e.currentTarget.href});
+    chrome.runtime.sendMessage({action: 'openTab', url: e.currentTarget.href});
     e.preventDefault();
   });
   return historyLinkElement;
@@ -60,10 +60,6 @@ function initialize(){
     var newlinks = getNewLinkElementsArray();
     if (newlinks.length) {
       patchNewsLinks(newlinks);
-      console.log('PATCHED', {els: newlinks});
-    }
-    else {
-      console.log('no new links');
     }
   }, 2 * 1000);
 }
