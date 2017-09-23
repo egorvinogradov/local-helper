@@ -6,7 +6,7 @@ const LINK_STYLE = `
 `;
 
 function getNewLinkElementsArray(){
-  var selector = 'a[href^="https://www.rescuetime.com/browse/activities/"]:not(.lh-patched)';
+  var selector = '.report-table a[href^="https://www.rescuetime.com/browse/activities/"]:not(.lh-patched)';
   return Array.prototype.slice.apply(document.querySelectorAll(selector));
 }
 
