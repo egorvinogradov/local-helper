@@ -16,6 +16,10 @@
     {
       "js": ["parse-linkedin-profile.js"],
       "matches": ["https://www.linkedin.com/*"]
+    },
+    {
+      "js": ["rescuetime-helper.js"],
+      "matches": ["https://www.rescuetime.com/*"]
     }
   ],
   "manifest_version": 2,
@@ -23,5 +27,10 @@
     "tabs",
     "<all_urls>"
   ],
-  "version": "2.0.0"
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "version": "3.0.0"
 }
