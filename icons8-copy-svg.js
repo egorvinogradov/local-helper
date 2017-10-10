@@ -1,9 +1,18 @@
-function getSVGOuterHTML(selector){
-  var icon = document.querySelector(selector);
+function getSVGOuterHTML(container){
+  var icon = container.querySelector('svg');
+  if (!icon) {
+    return null;
+  }
   var attrs = Array.prototype.map.call(icon.attributes, function(attr){
     return attr.name + '="' +  attr.value + '"';
   }).join(' ');
   return '<svg ' + attrs + '>' + icon.innerHTML + '</svg>';
+}
+
+function getSVGfromBase64(container) {
+  var icon = container.querySelector('img[src^=data]');
+  var encoded = icon.src.split('base64,')[1];
+  return atob(encoded);
 }
 
 function setUpClipboard(){
@@ -22,8 +31,8 @@ function copyToClipboard(text){
   clipboardEl.value = '';
 }
 
-function renderCopyButton(containerSelector){
-  var container = document.querySelector(containerSelector).parentNode.parentNode;
+function renderCopyButton(container){
+  var container = container.parentNode;
   var button = document.createElement('div');
   button.style = 'padding: 3px 0 5px 0;border: 1px solid rgba(0, 0, 0, 0.2);cursor: pointer;width: 60px;margin: 0 auto 5px auto;';
   button.innerHTML = 'Copy';
@@ -31,14 +40,18 @@ function renderCopyButton(containerSelector){
   return button;
 }
 
-function initializeSVGClipboard(selector){
+function initializeSVGClipboard(containerSelector){
   setUpClipboard();
-  var button = renderCopyButton(selector);
+  var container = document.querySelector(containerSelector);
+  var button = renderCopyButton(container);
   button.addEventListener('click', function(){
-    var svgCode = getSVGOuterHTML(selector);
+    var svgCode = getSVGOuterHTML(container);
+    if (!svgCode) {
+      svgCode = getSVGfromBase64(container);
+    }
     copyToClipboard(svgCode);
     alert('Copied');
   }, false);
 }
 
-initializeSVGClipboard('.icon-preview__svg svg');
+initializeSVGClipboard('.icon-preview__svg');

@@ -1,8 +1,8 @@
 const LINK_STYLE = `
-  margin-left: 8px;
+  margin-left: 5px;
   font-size: 0.8em;
   border-left: 1px solid rgba(0,0,0,.1);
-  padding-left: 8px;
+  padding-left: 6px;
 `;
 
 function getNewLinkElementsArray(){
@@ -18,26 +18,35 @@ function createElement(tagName, attributes) {
   return el;
 }
 
-function createHistoryLinkElement(domain){
-  var historyLinkElement = createElement('a', {
+function createBrowserHistoryLinkElement(domain){
+  var browserHistoryLinkElement = createElement('a', {
     target: '_blank',
     href: `chrome://history/?q=${domain}`,
-    innerText: 'View history',
+    innerText: 'Browser',
     style: LINK_STYLE
   });
-  historyLinkElement.addEventListener('click', function(e){
+  browserHistoryLinkElement.addEventListener('click', function(e){
     chrome.runtime.sendMessage({action: 'openTab', url: e.currentTarget.href});
     e.preventDefault();
   });
-  return historyLinkElement;
+  return browserHistoryLinkElement;
 }
 
-function createBrowseLinkElement(domain){
+function createGoogleHistoryLinkElement(domain){
+  return createElement('a', {
+    target: '_blank',
+    href: `https://myactivity.google.com/myactivity?q=%22${domain}%22`,
+    innerText: 'Google',
+    style: LINK_STYLE
+  });
+}
+
+function createOpenLinkElement(domain){
   return createElement('a', {
     target: '_blank',
     href: `http://${domain}`,
-    innerText: 'Browse',
-    style: LINK_STYLE
+    innerText: 'Open Website',
+    style: LINK_STYLE + `margin-left: 12px; border: 0;`
   });
 }
 
@@ -48,8 +57,9 @@ function insetAfter(referenceElement, newElement){
 function patchNewsLinks(linkElements){
   linkElements.forEach(function(el){
     domain = el.innerText;
-    insetAfter(el, createHistoryLinkElement(domain));
-    insetAfter(el, createBrowseLinkElement(domain));
+    insetAfter(el, createGoogleHistoryLinkElement(domain));
+    insetAfter(el, createBrowserHistoryLinkElement(domain));
+    insetAfter(el, createOpenLinkElement(domain));
     el.classList.add('lh-patched');
   });
 }
