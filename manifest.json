@@ -1,5 +1,5 @@
 {
-  "name": "Local Helper",
+  "name": "0 Local Helper",
   "content_scripts": [
     {
       "js": ["gg-reloader.js"],
