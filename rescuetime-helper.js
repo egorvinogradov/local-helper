@@ -64,8 +64,45 @@ function patchNewsLinks(linkElements){
   });
 }
 
+function initializeNeutralItemsSwitch(){
+  $('.report-table-meta .bulk-select-label').on('click', function(e){
+    setTimeout(function(){
+      $('#bulk-update-cancel-link').append(`
+        | <a id="lh-show-neutral" href="#" style="color: #8b9695">show neutral only</a>
+      `);
+      toggleHidden();
+      $('#lh-show-neutral').on('click', function(e){
+        $('.report-table tr').filter(function(i, el){
+          return !$(el).find('.productivity-link.score0').length;
+        }).hide();
+        e.preventDefault();
+      });
+    }, 200);
+  });
+}
+
+
+function toggleHidden(){
+  $('tr.row-hidden').removeClass('row-hidden');
+  $('#hidden-rows-toggle').hide();
+}
+
+function limitColumnWidth(){
+  const css = `
+  <style>
+    .report-table-primary-field {
+      max-width: 400px;
+    }
+  </style>
+  `;
+  $('head').append(css);
+}
+
+
 function initialize(){
   patchNewsLinks(getNewLinkElementsArray());
+  initializeNeutralItemsSwitch();
+  limitColumnWidth();
   setInterval(function(){
     var newlinks = getNewLinkElementsArray();
     if (newlinks.length) {
