@@ -77,7 +77,7 @@ function initializeNeutralItemsSwitch(){
         }).hide();
         e.preventDefault();
       });
-    }, 200);
+    }, 1000);
   });
 }
 
@@ -99,16 +99,62 @@ function limitColumnWidth(){
 }
 
 
+function appendCalcProductivityButton(){
+  var button = $('<div><button id="calc_productivity">Calc productivity</button></div>')
+    .find('button')
+    .css({
+      borderColor: '#41874d',
+      padding: '2px 7px 4px 7px',
+    })
+    .end();
+  $('.productivity-arc-comparison').append(button);
+  $('#summary-info-panels .row .large-12.small-12.columns').css('paddingTop', '20px');
+  button.on('click', function(){
+    var params = getProductivityParams();
+    var paramsArr = [];
+    for (var key in params) {
+      paramsArr.push(`${key}=${params[key]}`);
+    }
+    var url = `https://productivity-tool.surge.sh?${paramsArr.join('&')}`;
+    window.open(url);
+  });
+}
+
+function getProductivityParams(){
+  var jsCode = $('#rtdata_json').html().replace('//<![CDATA[', '').replace('//]]>', '');
+  eval(jsCode);
+
+  var productive = RTDATA.chart_data.productivity_arc.filter(a => a.name === 'Productive')[0].duration / 60 / 60
+    + RTDATA.chart_data.productivity_arc.filter(a => a.name === 'Very Productive')[0].duration / 60 / 60;
+
+  var distracting = RTDATA.chart_data.productivity_arc.filter(a => a.name === 'Distracting')[0].duration / 60 / 60
+    + RTDATA.chart_data.productivity_arc.filter(a => a.name === 'Very Distracting')[0].duration / 60 / 60;
+
+  return {
+    desiredProductivity: 70,
+    currentProductiveHours: Math.floor(productive),
+    currentProductiveMinutes: Math.floor((productive % 1) * 60),
+    currentUnproductiveHours: Math.floor(distracting),
+    currentUnproductiveMinutes: Math.floor((distracting % 1) * 60),
+  };
+}
+
+
 function initialize(){
   patchNewsLinks(getNewLinkElementsArray());
   initializeNeutralItemsSwitch();
   limitColumnWidth();
   setInterval(function(){
-    var newlinks = getNewLinkElementsArray();
-    if (newlinks.length) {
-      patchNewsLinks(newlinks);
+    if (window.location.pathname.indexOf('/dashboard') === 0 && !$('#calc_productivity').length) {
+      appendCalcProductivityButton();
     }
-  }, 2 * 1000);
+    if (window.location.pathname.indexOf('/browse/productivity') === 0) {
+      var newlinks = getNewLinkElementsArray();
+      if (newlinks.length) {
+        patchNewsLinks(newlinks);
+      }
+    }
+  }, 950);
 }
 
 initialize();
