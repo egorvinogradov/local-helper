@@ -1,4 +1,6 @@
 if (chrome.extension.inIncognitoContext) {
   document.body.innerHTML = '';
-  document.location.href = document.location.href.replace('https://www.google.com', 'https://www.google.ru');
+  if (/^(www\.)?google\.com$/i.test(document.location.host)) {
+    document.location.href = `https://www.google.ru${document.location.search}`;
+  }
 }
