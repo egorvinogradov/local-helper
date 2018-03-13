@@ -64,6 +64,29 @@ function patchNewsLinks(linkElements){
   });
 }
 
+function enableGoogleSearchLinks(){
+  $('.report-table-primary-field').toArray().forEach(item => {
+    var rawText = $(item).text().trim();
+    var linkText;
+    var linkUrl;
+    var searchTerm;
+
+    if (rawText.indexOf(' - Google Search') > -1) {
+      linkUrl = 'https://www.google.com/search?q=';
+      linkText = 'Google Search';
+      searchTerm = rawText.replace(' - Google Search', '').trim();
+    }
+    else if (rawText.indexOf(' - Google Maps') > -1) {
+      linkUrl = 'https://maps.google.com/maps?q=';
+      linkText = 'Google Maps';
+      searchTerm = rawText.replace(' - Google Maps', '').trim();
+    }
+    if (searchTerm) {
+      $(item).html(`${searchTerm} - <a href="${linkUrl}${searchTerm}" target="_blank">${linkText}</a>`)
+    }
+  });
+}
+
 function initializeNeutralItemsSwitch(){
   $('.report-table-meta .bulk-select-label').on('click', function(e){
     setTimeout(function(){
@@ -71,13 +94,18 @@ function initializeNeutralItemsSwitch(){
         | <a id="lh-show-neutral" href="#" style="color: #8b9695">show neutral only</a>
       `);
       toggleHidden();
+
+      if (location.pathname.indexOf('activities/223') > -1) {
+        enableGoogleSearchLinks();
+      }
+
       $('#lh-show-neutral').on('click', function(e){
         $('.report-table tr').filter(function(i, el){
           return !$(el).find('.productivity-link.score0').length;
         }).hide();
         e.preventDefault();
       });
-    }, 1000);
+    }, 1500);
   });
 }
 
