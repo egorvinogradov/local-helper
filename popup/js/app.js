@@ -29,10 +29,17 @@ function getLocalValue(key){
 function setInitialValues(){
   const prefix = getLocalValue('emails-prefix');
   const counter = getLocalValue('emails-counter');
+  const enableUniqueID = getLocalValue('enable-unique-id');
   if (+counter) {
     $('#b-emails__counter').val(+counter);
   }
+  
+  $('#b-emails__enable-unique-id')[0].checked = enableUniqueID;
   $('#b-emails__prefix').val(prefix);
+
+  if (!enableUniqueID) {
+    $('#b-emails__prefix, #b-emails__counter').hide();
+  }
   initAccountsDropdown();
 }
 
@@ -72,6 +79,12 @@ function initEvents(){
   $('#b-emails__counter').on('keyup', e => {
     let counter  = $(e.currentTarget).val();
     saveLocalValue('emails-counter', counter);
+  });
+
+  $('#b-emails__enable-unique-id').on('change', e => {
+    let enabled = !!$(e.currentTarget).is(':checked');
+    saveLocalValue('enable-unique-id', enabled);
+    $('#b-emails__prefix, #b-emails__counter')[enabled ? 'show' : 'hide']();
   });
 
   $('#b-emails__copy').on('click', e => {
