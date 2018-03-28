@@ -82,24 +82,30 @@ function initEvents(){
   });
 
   $('#b-emails__enable-unique-id').on('change', e => {
-    let enabled = !!$(e.currentTarget).is(':checked');
-    saveLocalValue('enable-unique-id', enabled);
-    $('#b-emails__prefix, #b-emails__counter')[enabled ? 'show' : 'hide']();
+    let enableUniqueID = !!$(e.currentTarget).is(':checked');
+    saveLocalValue('enable-unique-id', enableUniqueID);
+    $('#b-emails__prefix, #b-emails__counter')[enableUniqueID ? 'show' : 'hide']();
   });
 
   $('#b-emails__copy').on('click', e => {
     const email = $('#b-emails__dropdown .dropdown-toggle').text();
-    const prefix = $('#b-emails__prefix').val() || 'test';
-    const counter = +$('#b-emails__counter').val() || 0;
-    const testEmail = `${email.split('@')[0]}+${prefix}+${counter}@${email.split('@')[1]}`;
+    const enableUniqueID = !!$('#b-emails__enable-unique-id').is(':checked');
 
-    setTimeout(() => {
-      const newCounter = counter + 1;
-      $('#b-emails__counter').val(newCounter);
-      saveLocalValue('emails-counter', newCounter);
-    }, 500);
-
-    copyToClipboard(testEmail);
+    if (enableUniqueID) {
+      const prefix = $('#b-emails__prefix').val() || 'test';
+      const counter = +$('#b-emails__counter').val() || 0;
+      const testEmail = `${email.split('@')[0]}+${prefix}+${counter}@${email.split('@')[1]}`;
+      
+      setTimeout(() => {
+        const newCounter = counter + 1;
+        $('#b-emails__counter').val(newCounter);
+        saveLocalValue('emails-counter', newCounter);
+      }, 500);
+      copyToClipboard(testEmail);
+    }
+    else {
+      copyToClipboard(email);
+    }
   });
 }
 
