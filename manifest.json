@@ -24,6 +24,10 @@
     {
       "js": ["libs/jquery.js", "rescuetime-helper.js"],
       "matches": ["https://www.rescuetime.com/*"]
+    },
+    {
+      "js": ["libs/jquery.js", "trello-copy-todos.js"],
+      "matches": ["https://trello.com/*"]
     }
   ],
   "manifest_version": 2,
@@ -36,7 +40,7 @@
       "background.js"
     ]
   },
-  "version": "5.0.0",
+  "version": "6.0.0",
   "browser_action": {
     "default_title": "Local Helper",
     "default_popup": "popup/popup.html"

@@ -25,9 +25,9 @@ function setUpClipboard(){
 function copyToClipboard(text){
   var clipboardEl = document.getElementById('local-helper-clipboard');
   clipboardEl.value = text;
-  clipboardEl.select()
+  clipboardEl.select();
   document.execCommand('copy');
-  clipboardEl.blur()
+  clipboardEl.blur();
   clipboardEl.value = '';
 }
 
