@@ -19,11 +19,7 @@ function getColumnTODOs(){
 }
 
 function setUpClipboard(){
-  var clipboardHTML = `
-    <div style="position: absolute; left: -100em">
-      <textarea id="local-helper-clipboard"></textarea>
-    </div>
-  `;
+  var clipboardHTML = `<textarea id="local-helper-clipboard" style="width: 0;height: 0;padding: 0;margin: 0;position: absolute;"></textarea>`;
   $('body').append(clipboardHTML);
 }
 
