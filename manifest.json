@@ -6,10 +6,6 @@
       "matches": ["http://e.ggtimer.com/*"]
     },
     {
-      "js": ["rbc-clipboard.js"],
-      "matches": ["https://www.rbc.ru/*"]
-    },
-    {
       "js": ["google-redirect.js"],
       "matches": ["https://www.google.com/*"]
     },
@@ -28,6 +24,10 @@
     {
       "js": ["libs/jquery.js", "trello-copy-todos.js"],
       "matches": ["https://trello.com/*"]
+    },
+    {
+      "js": ["prevent-extra-text-in-clipboard.js"],
+      "matches": ["https://www.notion.so/*", "https://www.rbc.ru/*"]
     }
   ],
   "manifest_version": 2,
@@ -40,7 +40,7 @@
       "background.js"
     ]
   },
-  "version": "6.0.0",
+  "version": "7.1.0",
   "browser_action": {
     "default_title": "Local Helper",
     "default_popup": "popup/popup.html"
