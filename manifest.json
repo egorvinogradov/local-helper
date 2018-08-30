@@ -10,7 +10,7 @@
       "matches": ["https://www.google.com/*"]
     },
     {
-      "js": ["icons8-copy-svg.js"],
+      "js": ["libs/jquery.js", "icons8-copy-svg.js"],
       "matches": ["https://icons8.com/*"]
     },
     {
@@ -44,7 +44,7 @@
       "background.js"
     ]
   },
-  "version": "7.1.0",
+  "version": "7.2.0",
   "browser_action": {
     "default_title": "Local Helper",
     "default_popup": "popup/popup.html"
