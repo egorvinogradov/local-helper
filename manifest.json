@@ -28,6 +28,10 @@
     {
       "js": ["prevent-extra-text-in-clipboard.js"],
       "matches": ["https://www.notion.so/*", "https://www.rbc.ru/*"]
+    },
+    {
+      "js": ["libs/jquery.js"],
+      "matches": ["<all_urls>"]
     }
   ],
   "manifest_version": 2,
