@@ -57,6 +57,9 @@ function insetAfter(referenceElement, newElement){
 function patchNewsLinks(linkElements){
   linkElements.forEach(function(el){
     domain = el.innerText;
+    el.href = el.href
+      .replace(/by\/day\/for/, 'by/rank/for')
+      .replace(/by\/hour\/for/, 'by/rank/for');
     insetAfter(el, createGoogleHistoryLinkElement(domain));
     insetAfter(el, createBrowserHistoryLinkElement(domain));
     insetAfter(el, createOpenLinkElement(domain));
