@@ -44,7 +44,7 @@
       "background.js"
     ]
   },
-  "version": "7.2.0",
+  "version": "7.3.0",
   "browser_action": {
     "default_title": "Local Helper",
     "default_popup": "popup/popup.html"
