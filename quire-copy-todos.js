@@ -1,29 +1,20 @@
-function attachCopyButtons(){
-  var taskBarEls = $('.tree-item.task .tree-list:not(:empty)').toArray().map(el => {
-    return $(el).parent().find('> .tree-row > .tree-row-content > .task-menu-bar')[0];
-  });
-  $(taskBarEls).toArray().map(el => {
-    $(el).prepend(`<i class="i-btn x30 lh-copy-tasks new-task-btn next-sibling icon-paste"></i>`);
-  });
-}
-
-function onCopyButtonClick(e){
-  var taskTexts = $(e.target)
-    .parents('.tree-item.task')
-    .eq(0)
-    .find('.task-name')
+function getSelectedTaskNames(){
+  return $('.task.selected')
     .toArray()
-    .map(el => $(el).text().trim());
-
-  console.log('Copy tasks:\n\n' + taskTexts.join('\n'));
-  navigator.clipboard.writeText(taskTexts.join('\n'));
-  e.preventDefault();
-  e.stopPropagation();
+    .map(el => $(el).find('> .tree-row .task-name').text() );
 }
 
 function initExtension(){
-  attachCopyButtons();
-  $('body').delegate('.lh-copy-tasks', 'mousedown', onCopyButtonClick);
+  var html = `
+    <div class="btn-wrap">
+      <a class="lh-copy-tasks icon-paste i-btn x30" href="#" data-toggle="quire-popover" data-tooltip="Complete"></a>
+    </div>
+  `;
+  $('.ws-bottom-bar .btn-row').prepend(html);
+  $('.lh-copy-tasks').on('click', e => {
+    var tasks = getSelectedTaskNames();
+    navigator.clipboard.writeText(tasks.join('\n'));
+  });
 }
 
 setTimeout(() => {
