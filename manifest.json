@@ -36,6 +36,10 @@
     {
       "js": ["quire-copy-todos.js"],
       "matches": ["https://quire.io/*"]
+    },
+    {
+      "js": ["ivi.js"],
+      "matches": ["https://www.ivi.ru/*"]
     }
   ],
   "manifest_version": 2,
@@ -48,7 +52,7 @@
       "background.js"
     ]
   },
-  "version": "8.0.1",
+  "version": "9.0.0",
   "browser_action": {
     "default_title": "Local Helper",
     "default_popup": "popup/popup.html"
