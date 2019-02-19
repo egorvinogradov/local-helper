@@ -74,15 +74,15 @@ function enableGoogleSearchLinks(){
     var linkUrl;
     var searchTerm;
 
-    if (rawText.indexOf(' - Google Search') > -1) {
+    if (rawText.indexOf('- Google Search') > -1) {
       linkUrl = 'https://www.google.com/search?q=';
       linkText = 'Google Search';
-      searchTerm = rawText.replace(' - Google Search', '').trim();
+      searchTerm = rawText.replace('- Google Search', '').replace('- Google Chrome', '').trim();
     }
-    else if (rawText.indexOf(' - Google Maps') > -1) {
+    else if (rawText.indexOf('- Google Maps') > -1) {
       linkUrl = 'https://maps.google.com/maps?q=';
       linkText = 'Google Maps';
-      searchTerm = rawText.replace(' - Google Maps', '').trim();
+      searchTerm = rawText.replace('- Google Maps', '').replace('- Google Chrome', '').trim();
     }
     if (searchTerm) {
       $(item).html(`${searchTerm} - <a href="${linkUrl}${searchTerm}" target="_blank">${linkText}</a>`)
