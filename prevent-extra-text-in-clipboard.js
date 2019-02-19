@@ -7,9 +7,12 @@
 
 
 const DOMAIN_HANDLERS = {
-  'www.rbc.ru': (text) => {
+  'www.rbc.ru': text => {
     return text.split(/\n\nПодробнее на РБК:/m)[0];
-  }
+  },
+  'www.securitylab.ru': text => {
+    return text.split(/Подробнее:/)[0].trim();
+  },
 };
 
 document.addEventListener('copy', function(e){
