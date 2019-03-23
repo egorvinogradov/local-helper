@@ -5,10 +5,28 @@ const LINK_STYLE = `
   padding-left: 6px;
 `;
 
+const GLOBAL_CSS = `
+  table.bulk-editing tr:hover {
+    background: rgba(0,0,0,.1);
+  }
+  .report-table-primary-field {
+    max-width: 400px;
+  }
+`;
+
+  
+function appendGlobalStyles(){
+  document.body.appendChild(createElement('style', {
+    innerHTML: GLOBAL_CSS
+  }));
+}
+
+
 function getNewLinkElementsArray(){
   var selector = '.report-table a[href^="https://www.rescuetime.com/browse/activities/"]:not(.lh-patched)';
   return Array.prototype.slice.apply(document.querySelectorAll(selector));
 }
+
 
 function createElement(tagName, attributes) {
   var el = document.createElement(tagName);
@@ -17,6 +35,7 @@ function createElement(tagName, attributes) {
   }
   return el;
 }
+
 
 function createBrowserHistoryLinkElement(domain){
   var browserHistoryLinkElement = createElement('a', {
@@ -32,6 +51,7 @@ function createBrowserHistoryLinkElement(domain){
   return browserHistoryLinkElement;
 }
 
+
 function createGoogleHistoryLinkElement(domain){
   return createElement('a', {
     target: '_blank',
@@ -40,6 +60,7 @@ function createGoogleHistoryLinkElement(domain){
     style: LINK_STYLE
   });
 }
+
 
 function createOpenLinkElement(domain){
   return createElement('a', {
@@ -50,9 +71,11 @@ function createOpenLinkElement(domain){
   });
 }
 
+
 function insetAfter(referenceElement, newElement){
   referenceElement.nextSibling.parentNode.insertBefore(newElement, referenceElement.nextSibling);
 }
+
 
 function patchNewsLinks(linkElements){
   linkElements.forEach(function(el){
@@ -66,6 +89,7 @@ function patchNewsLinks(linkElements){
     el.classList.add('lh-patched');
   });
 }
+
 
 function enableGoogleSearchLinks(){
   $('.report-table-primary-field').toArray().forEach(item => {
@@ -89,6 +113,7 @@ function enableGoogleSearchLinks(){
     }
   });
 }
+
 
 function initializeNeutralItemsSwitch(){
   $('.report-table-meta .bulk-select-label').on('click', function(e){
@@ -116,17 +141,6 @@ function initializeNeutralItemsSwitch(){
 function toggleHidden(){
   $('tr.row-hidden').removeClass('row-hidden');
   $('#hidden-rows-toggle').hide();
-}
-
-function limitColumnWidth(){
-  const css = `
-  <style>
-    .report-table-primary-field {
-      max-width: 400px;
-    }
-  </style>
-  `;
-  $('head').append(css);
 }
 
 
@@ -174,7 +188,7 @@ function getProductivityParams(){
 function initialize(){
   patchNewsLinks(getNewLinkElementsArray());
   initializeNeutralItemsSwitch();
-  limitColumnWidth();
+  appendGlobalStyles();
   setInterval(function(){
     if (window.location.pathname.indexOf('/dashboard') === 0 && !$('#calc_productivity').length) {
       appendCalcProductivityButton();
