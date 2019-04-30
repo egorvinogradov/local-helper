@@ -23,5 +23,16 @@ document.addEventListener('copy', function(e){
   if (DOMAIN_HANDLERS[location.hostname]) {
     text = DOMAIN_HANDLERS[location.hostname](text, e);
   }
-  navigator.clipboard.writeText(text);
+
+  navigator.permissions.query({name: 'clipboard-write'}).then(function(permissionStatus) {
+    console.log('clipboard-write permission state is ', permissionStatus.state);
+
+    permissionStatus.onchange = function() {
+      console.log('clipboard-write permission state has changed to ', this.state);
+    };
+  });
+
+  navigator.clipboard.writeText(text).catch(err => {
+    console.error('Could not copy text: ', err);
+  });
 }, false);
