@@ -52,7 +52,7 @@
       "background.js"
     ]
   },
-  "version": "9.1.0",
+  "version": "9.2.0",
   "browser_action": {
     "default_title": "Local Helper",
     "default_popup": "popup/popup.html"
