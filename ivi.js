@@ -13,7 +13,9 @@ function getVideoElement(){
 
 function onFKeyPress(e){
   if (e.which === 102 || e.which === 1072 /* English "F" or Russian "А" */) {
-    switchFullscreen();
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      switchFullscreen();
+    }
   }
 }
 
@@ -22,7 +24,10 @@ function switchFullscreen(videoIframe){
     document.exitFullscreen();
   }
   else {
-    getVideoElement().requestFullscreen();
+    try {
+      getVideoElement().requestFullscreen();
+    }
+    catch (e) {}
   }
 }
 
@@ -58,8 +63,11 @@ function init(){
     $(videoIframe).on('keypress', onFKeyPress);
 
     waitFor(isVideoPlaying, 10000, () => {
-      getVideoElement().pause();
-      setTimeout(hideLoader, 1500);
+      try {
+        getVideoElement().pause();
+        setTimeout(hideLoader, 1500);
+      }
+      catch (e) {}
     });
   }
 }
