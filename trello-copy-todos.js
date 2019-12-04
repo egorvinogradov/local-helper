@@ -28,7 +28,7 @@ function copyToClipboard(text){
 
 function attachCopyButton(columnEls, callback){
   var extrasIcons = columnEls.find('.list-header-extras .icon-overflow-menu-horizontal');
-  var buttonHTML = `<a class="list-header-extras-menu dark-hover icon-lg icon-attachment" href="#"><div></div></a>`;
+  var buttonHTML = `<a class="list-header-extras-menu dark-hover icon-sm icon-attachment" href="#"><div></div></a>`;
 
   extrasIcons.toArray().map(icon => {
     var buttonElement = $(buttonHTML).on('click', () => {
