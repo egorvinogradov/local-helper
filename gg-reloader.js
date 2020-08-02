@@ -3,8 +3,8 @@
  */
 
 const mainInterval = setInterval(function() {
-  var text = document.getElementById('progressText').innerText.toLowerCase();
-  if (/time expired/i.test(text)) {
+  var progressBar = document.getElementById('progressText');
+  if (progressBar && /time expired/i.test( progressBar.innerText.toLowerCase() )) {
     clearInterval(mainInterval);
     setTimeout(function() {
       showPopup();
