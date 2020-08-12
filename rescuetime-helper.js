@@ -148,8 +148,8 @@ function appendCalcProductivityButton(){
   var button = $('<div><button id="calc_productivity">Calc productivity</button></div>')
     .find('button')
     .css({
-      borderColor: '#41874d',
-      padding: '2px 7px 4px 7px',
+      padding: '2px 7px 1px 7px',
+      margin: '-2px 0 0 3px',
     })
     .end();
   $('.productivity-arc-comparison').append(button);
