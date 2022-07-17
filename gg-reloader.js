@@ -3,7 +3,7 @@
  */
 
 const mainInterval = setInterval(function() {
-  var progressBar = document.getElementById('progressText');
+  var progressBar = document.getElementsByClassName('ClassicTimer-time')[0];
   if (progressBar && /time expired/i.test( progressBar.innerText.toLowerCase() )) {
     clearInterval(mainInterval);
     setTimeout(function() {
