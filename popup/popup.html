@@ -14,49 +14,61 @@
 
   <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item">
-      <a class="nav-link active" data-toggle="tab" href="#home" aria-selected="true">
+      <a class="nav-link active" data-toggle="tab" href="#home">
         <i class="fa fa-shopping-basket"></i>
         Generate Email
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#settings">
+        <i class="fa fa-cog"></i>
+        Settings
       </a>
     </li>
   </ul>
 
   <div class="tab-content" id="myTabContent">
-    <div class="tab-pane show active pt-4" id="home">
+    <div class="tab-pane show active pt-3" id="home">
 
 
       <!-- Tab Content -->
 
-      <p class="form-check">
+    <div class="b-emails-list"></div>
+
+
+
+<!--       <p class="form-check">
         <input class="form-check-input" type="checkbox" id="b-emails__enable-unique-id">
         <label class="form-check-label" for="b-emails__enable-unique-id">
           Enable unique ID
         </label>
-      </p>
+      </p> -->
 
-      <div class="input-group b-emails__inputs">
+<!--       <div class="input-group b-emails__inputs">
         <div class="input-group-prepend" id="b-emails__dropdown">
-          <button class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+          <button class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
           <div class="dropdown-menu"></div>
         </div>
+
         <input type="text" class="form-control" placeholder="prefix" id="b-emails__prefix">
         <input type="number" class="form-control" placeholder="0" id="b-emails__counter" min="0">
         <div class="input-group-append">
-          <button class="btn btn-primary" type="button" id="b-emails__copy">Copy</button>
+          <button class="btn btn-primary" id="b-emails__copy">Copy</button>
         </div>
+      </div> -->
+
+      <textarea id="lh-clipboard" class="b-clipboard">Hello I'm some text</textarea></div>
+
+    <div class="tab-pane pt-3" id="settings">
+      <div class="form-group">
+        <label>Emails:</label>
+        <textarea class="form-control" rows="5" id="b-settings-emails"></textarea>
       </div>
-
-      <textarea id="lh-clipboard" class="b-clipboard">Hello I'm some text</textarea>
-
-      <!-- / Tab Content -->
-
-
-    </div>
-    <div class="tab-pane pt-3" id="profile">
-      Content 2
-    </div>
-    <div class="tab-pane pt-3" id="contact">
-      Content 3
+      <div class="form-group">
+        <label>ChatGPT prompts:</label>
+        <textarea class="form-control" rows="6" id="b-settings-chatgpt-prompts"></textarea>
+      </div>
+      <button class="btn btn-primary" id="b-settings-save">Save</button>
     </div>
   </div>
 

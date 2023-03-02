@@ -1,6 +1,20 @@
-.b-emails__inputs {
-  min-width: 500px;
+.tab-pane {
+  min-width: 400px;
 }
+
+/*.b-emails__inputs {
+  min-width: 500px;
+}*/
+
+.b-email-button {
+  width: 70%;
+}
+
+.b-email-button button {
+  width: 100%;
+  text-align: left;
+}
+
 
 .b-clipboard {
   width: 1px;

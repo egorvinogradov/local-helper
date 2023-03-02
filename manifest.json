@@ -31,7 +31,7 @@
     },
     {
       "js": ["prevent-extra-text-in-clipboard.js"],
-      "matches": ["https://www.notion.so/*", "https://www.rbc.ru/*", "https://www.securitylab.ru/*", "https://www.nebo-v-podarok.ru/*"]
+      "matches": ["https://www.rbc.ru/*", "https://www.securitylab.ru/*", "https://www.nebo-v-podarok.ru/*"]
     },
     {
       "js": ["quire-copy-todos.js"],
@@ -40,20 +40,24 @@
     {
       "js": ["ivi.js"],
       "matches": ["https://www.ivi.ru/*"]
+    },
+    {
+      "js": ["chat-gpt-utils.js"],
+      "matches": ["https://chat.openai.com/*"]
     }
   ],
-  "manifest_version": 2,
+  "manifest_version": 3,
   "permissions": [
-    "tabs",
-    "<all_urls>"
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*/*"
   ],
   "background": {
-    "scripts": [
-      "background.js"
-    ]
+    "service_worker": "background.js"
   },
-  "version": "9.2.0",
-  "browser_action": {
+  "version": "10.0.0",
+  "action": {
     "default_title": "Local Helper",
     "default_popup": "popup/popup.html"
   }
