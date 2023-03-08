@@ -2,9 +2,9 @@
   min-width: 400px;
 }
 
-/*.b-emails__inputs {
-  min-width: 500px;
-}*/
+.b-emails-list {
+  margin-bottom: -35px;
+}
 
 .b-email-button {
   width: 70%;
@@ -14,7 +14,6 @@
   width: 100%;
   text-align: left;
 }
-
 
 .b-clipboard {
   width: 1px;

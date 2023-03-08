@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/libs/jquery-ui.min.css">
   <link rel="stylesheet" href="css/libs/bootstrap.css">
   <link rel="stylesheet" href="css/libs/fontawesome-all.css">
-  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/popup.css">
 </head>
 
 <body class="m-3 b-app">
@@ -28,36 +28,11 @@
   </ul>
 
   <div class="tab-content" id="myTabContent">
+
     <div class="tab-pane show active pt-3" id="home">
-
-
-      <!-- Tab Content -->
-
-    <div class="b-emails-list"></div>
-
-
-
-<!--       <p class="form-check">
-        <input class="form-check-input" type="checkbox" id="b-emails__enable-unique-id">
-        <label class="form-check-label" for="b-emails__enable-unique-id">
-          Enable unique ID
-        </label>
-      </p> -->
-
-<!--       <div class="input-group b-emails__inputs">
-        <div class="input-group-prepend" id="b-emails__dropdown">
-          <button class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-          <div class="dropdown-menu"></div>
-        </div>
-
-        <input type="text" class="form-control" placeholder="prefix" id="b-emails__prefix">
-        <input type="number" class="form-control" placeholder="0" id="b-emails__counter" min="0">
-        <div class="input-group-append">
-          <button class="btn btn-primary" id="b-emails__copy">Copy</button>
-        </div>
-      </div> -->
-
-      <textarea id="lh-clipboard" class="b-clipboard">Hello I'm some text</textarea></div>
+      <div class="b-emails-list"></div>
+      <textarea id="lh-clipboard" class="b-clipboard"></textarea>
+    </div>
 
     <div class="tab-pane pt-3" id="settings">
       <div class="form-group">
@@ -70,6 +45,7 @@
       </div>
       <button class="btn btn-primary" id="b-settings-save">Save</button>
     </div>
+
   </div>
 
   <script src="js/libs/jquery-3.3.1.min.js"></script>
@@ -78,6 +54,6 @@
   <script src="js/libs/bootstrap.min.js"></script>
   <script src="js/libs/underscore-min.js"></script>
   <script src="js/libs/angular.min.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/popup.js"></script>
 </body>
 </html>

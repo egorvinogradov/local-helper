@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener(function(request) {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'openTab') {
     chrome.tabs.create({
       url: request.url,
@@ -6,6 +6,7 @@ chrome.runtime.onMessage.addListener(function(request) {
     });
   }
 });
+
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
   var tabUrl;
