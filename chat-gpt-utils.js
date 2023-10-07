@@ -36,7 +36,7 @@ function checkIfPageUpdated(){
     replies.length !== window.__currentRepliesNumber ||
     firstReplyText !== window.__currentFirstReplyText;
 
-  const hasTextareaReset = !document.querySelector('#local-helper-prompts');
+  const hasTextareaReset = !getSelect();
 
   if (haveRepliesChange) {
     window.__currentRepliesNumber = replies.length;
@@ -49,37 +49,6 @@ function checkIfPageUpdated(){
   };
 }
 
-
-function appendPromptSelect(prompts){
-  const options = ['Prompts...', ...prompts].map((prompt, i) => {
-    return `<option value="${prompt}">
-      ${i ? i + '.' : ''}
-      ${prompt}
-    </option>`;
-  });
-
-  const select = document.createElement('select');
-  select.id = 'local-helper-prompts';
-  select.innerHTML = options.join('\n');
-  select.style = `
-    border: 0;
-    width: min-content;
-    padding: 0 40px 0 0;
-    margin: 0 0 5px 0;
-    color: gray;
-    box-shadow: none;
-  `;
-
-  const textarea = getTextarea();
-  const container = textarea?.parentElement;
-  if (textarea && container) {
-    container.insertBefore(select, container.firstChild);
-  }
-
-  return select;
-}
-
-
 function excludePreviousPrompt(textareaValue, previousPrompt){
   return textareaValue.replace(previousPrompt + '\n\n', '');
 }
@@ -87,6 +56,10 @@ function excludePreviousPrompt(textareaValue, previousPrompt){
 
 function getTextarea(){
   return document.querySelector('form textarea');
+}
+
+function getSelect(){
+  return document.querySelector('#local-helper-prompts');
 }
 
 
@@ -156,12 +129,79 @@ function flashAvatar(avatarElement){
 }
 
 
-function enablePrompts(){
+function initializeSelect(){
   const prompts = getFromLocalStorage('chatgpt-prompts') || [];
-  const select = appendPromptSelect(prompts);
+
+  const options = ['Prompts...', ...prompts].map((prompt, i) => {
+    return `<option value="${prompt}">
+      ${i ? i + '.' : ''}
+      ${prompt}
+    </option>`;
+  });
+
+  const select = document.createElement('select');
+  select.id = 'local-helper-prompts';
   select.addEventListener('change', onSelectChange);
+
+  document.addEventListener('keydown', function(e) {
+    if (e.metaKey && e.keyCode === 48) { /* Cmd+0 */
+      getSelect().focus();
+    }
+  });
+
+  setSelectPrompts(select, prompts);
+  addCustomCSS();
+
+  const textarea = getTextarea();
+  const container = textarea?.parentElement;
+  if (textarea && container) {
+    container.insertBefore(select, container.firstChild);
+  }
 }
 
+function addCustomCSS(){
+  const style = document.createElement('style');
+  style.type = 'text/css';
+  style.innerHTML = `
+    #local-helper-prompts {
+      border: 0;
+      width: min-content;
+      padding: 5px;
+      margin: 9px 0px -3px 11px;
+      color: gray;
+      box-shadow: none;
+      background: none;
+      position: relative;
+      background: none;
+      transition: opacity 200ms;
+    }
+
+    #local-helper-prompts:focus {
+      background: none;
+      animation: local-helper-prompts-blink 500ms infinite alternate;
+    }
+
+    @keyframes local-helper-prompts-blink {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function setSelectPrompts(select, prompts) {
+  const options = ['Prompts...', ...prompts].map((prompt, i) => {
+    return `<option value="${prompt}">
+      ${i ? i + '.' : ''}
+      ${prompt}
+    </option>`;
+  });
+  select.innerHTML = options.join('\n');
+}
 
 function initializePopupMessaging(){
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -172,23 +212,26 @@ function initializePopupMessaging(){
     else if (request.action === 'saveChatGPTPrompts') {
       const { prompts } = request.data || {};    
       saveToLocalStorage('chatgpt-prompts', prompts || []);
+      setSelectPrompts(getSelect(), prompts);
       sendResponse(true);
     }
   });
 }
 
 
-enablePrompts();
+initializeSelect();
 enableAvatarClickToCopy();
 initializePopupMessaging();
+
 
 watchContentUpdate(status => {
   const { haveRepliesChange, hasTextareaReset } = status;
 
-  if (haveRepliesChange) {
+  if (haveRepliesChange && !hasTextareaReset) {
     enableAvatarClickToCopy();
+    getSelect().value = 'Prompts...';
   }
   if (hasTextareaReset) {
-    enablePrompts();
+    initializeSelect();
   }
 });

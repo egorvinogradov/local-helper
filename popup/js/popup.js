@@ -74,7 +74,7 @@ function restoreSettingsFormPrompts(prompts){
   if (prompts?.length) {
     promptsTextarea.val(prompts.join('\n\n'));
   }
-  else {
+  else if (prompts.error) {
     promptsTextarea
       .attr({ disabled: true })
       .val('OPEN HTTPS://CHAT.OPENAI.COM/CHAT AND TRY AGAIN');
