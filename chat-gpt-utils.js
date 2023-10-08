@@ -1,22 +1,40 @@
-window.__currentPrompt = '';
+window.__currentDropdownPrompt = '';
 window.__currentRepliesNumber = 0;
 window.__currentFirstReplyText = '';
 
+
+function parseLocationSearch() {
+  const params = {};
+  const queryString = location.search.substring(1);
+  const pairs = queryString.split('&');
+  pairs.forEach(pair => {
+    const [key, value] = pair.split('=');
+    params[decodeURIComponent(key)] = decodeURIComponent(value);
+  });
+  return params;
+}
+
+function setTextareaFromGETParams() {
+  const { copilot, prompt } = parseLocationSearch();
+  if (copilot) {
+    const COPILOT_PROMPT = 'Complete this code:';
+    setTextareaText(COPILOT_PROMPT + '\n\n' + copilot);
+  }
+  else if (prompt) {
+    setTextareaText(prompt);
+  }
+}
 
 function saveToLocalStorage(key, value) {
   localStorage.setItem('lh-' + key, JSON.stringify(value));
 }
 
-
 function getFromLocalStorage(key){
   try {
     return JSON.parse(localStorage.getItem('lh-' + key));
   }
-  catch (e) {
-    return;
-  }
+  catch (e) {}
 }
-
 
 function watchContentUpdate(onUpdate){
   setInterval(() => {
@@ -25,8 +43,7 @@ function watchContentUpdate(onUpdate){
       onUpdate(status);
     }
   }, 500);
-};
-
+}
 
 function checkIfPageUpdated(){
   const replies = document.querySelectorAll('.w-full.border-b');
@@ -36,7 +53,7 @@ function checkIfPageUpdated(){
     replies.length !== window.__currentRepliesNumber ||
     firstReplyText !== window.__currentFirstReplyText;
 
-  const hasTextareaReset = !getSelect();
+  const hasTextareaReset = !getPromptDropdown();
 
   if (haveRepliesChange) {
     window.__currentRepliesNumber = replies.length;
@@ -58,7 +75,7 @@ function getTextarea(){
   return document.querySelector('form textarea');
 }
 
-function getSelect(){
+function getPromptDropdown(){
   return document.querySelector('#local-helper-prompts');
 }
 
@@ -73,15 +90,15 @@ function setTextareaText(text){
 }
 
 
-function onSelectChange(e){
+function onPromptDropdownChange(e){
   const textarea = getTextarea();
-  const textareaText = excludePreviousPrompt(textarea.value, window.__currentPrompt);
+  const textareaText = excludePreviousPrompt(textarea.value, window.__currentDropdownPrompt);
   const prompt = e.target.value;
-  window.__currentPrompt = prompt;
+  window.__currentDropdownPrompt = prompt;
 
   const placeholderPrompt = document.querySelector('#local-helper-prompts option:first-child');
   if (prompt === placeholderPrompt.value) {
-    window.__currentPrompt = '';
+    window.__currentDropdownPrompt = '';
     setTextareaText(textareaText);
   }
   else {
@@ -129,37 +146,29 @@ function flashAvatar(avatarElement){
 }
 
 
-function initializeSelect(){
+function initializePromptDropdown(){
   const prompts = getFromLocalStorage('chatgpt-prompts') || [];
-
-  const options = ['Prompts...', ...prompts].map((prompt, i) => {
-    return `<option value="${prompt}">
-      ${i ? i + '.' : ''}
-      ${prompt}
-    </option>`;
-  });
-
-  const select = document.createElement('select');
-  select.id = 'local-helper-prompts';
-  select.addEventListener('change', onSelectChange);
+  const promptDropdown = document.createElement('select');
+  promptDropdown.id = 'local-helper-prompts';
+  promptDropdown.addEventListener('change', onPromptDropdownChange);
 
   document.addEventListener('keydown', function(e) {
-    if (e.metaKey && e.keyCode === 48) { /* Cmd+0 */
-      getSelect().focus();
+    if (e.metaKey && e.key === '0') { /* Cmd+0 */
+      getPromptDropdown().focus();
     }
   });
 
-  setSelectPrompts(select, prompts);
-  addCustomCSS();
+  setDropdownPrompts(promptDropdown, prompts);
+  addPromptDropdownCustomCSS();
 
   const textarea = getTextarea();
   const container = textarea?.parentElement;
   if (textarea && container) {
-    container.insertBefore(select, container.firstChild);
+    container.insertBefore(promptDropdown, container.firstChild);
   }
 }
 
-function addCustomCSS(){
+function addPromptDropdownCustomCSS(){
   const style = document.createElement('style');
   style.type = 'text/css';
   style.innerHTML = `
@@ -193,14 +202,14 @@ function addCustomCSS(){
   document.head.appendChild(style);
 }
 
-function setSelectPrompts(select, prompts) {
+function setDropdownPrompts(promptDropdown, prompts) {
   const options = ['Prompts...', ...prompts].map((prompt, i) => {
     return `<option value="${prompt}">
       ${i ? i + '.' : ''}
       ${prompt}
     </option>`;
   });
-  select.innerHTML = options.join('\n');
+  promptDropdown.innerHTML = options.join('\n');
 }
 
 function initializePopupMessaging(){
@@ -212,14 +221,15 @@ function initializePopupMessaging(){
     else if (request.action === 'saveChatGPTPrompts') {
       const { prompts } = request.data || {};    
       saveToLocalStorage('chatgpt-prompts', prompts || []);
-      setSelectPrompts(getSelect(), prompts);
+      setDropdownPrompts(getPromptDropdown(), prompts);
       sendResponse(true);
     }
   });
 }
 
 
-initializeSelect();
+setTextareaFromGETParams();
+initializePromptDropdown();
 enableAvatarClickToCopy();
 initializePopupMessaging();
 
@@ -229,9 +239,9 @@ watchContentUpdate(status => {
 
   if (haveRepliesChange && !hasTextareaReset) {
     enableAvatarClickToCopy();
-    getSelect().value = 'Prompts...';
+    getPromptDropdown().value = 'Prompts...';
   }
   if (hasTextareaReset) {
-    initializeSelect();
+    initializePromptDropdown();
   }
 });
