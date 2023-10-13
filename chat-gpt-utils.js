@@ -22,16 +22,19 @@ function parseLocationSearch() {
 }
 
 function setTextareaFromGETParams() {
-  const { copilot, prompt } = parseLocationSearch();
+  const { copilot, prompt, translate } = parseLocationSearch();
   if (copilot) {
     const COPILOT_PROMPT = 'Complete this code:';
     setTextareaText(COPILOT_PROMPT + '\n\n' + copilot);
   }
+  if (translate) {
+    const TRANSLATION_PROMPT = 'Translate this text. Don\'t reformat links, keep them as they are.';
+    setTextareaText(TRANSLATION_PROMPT + '\n\n' + translate);
+  }
   else if (prompt) {
     setTextareaText(prompt);
   }
-
-  if (copilot || prompt) {
+  if (copilot || prompt || translate) {
     waitUntilTabFullyLoaded(triggerSubmit);
   }
 }
@@ -250,7 +253,7 @@ function waitUntilTabFullyLoaded(callback) {
       clearInterval(interval);
       callback();
     }
-  }, 100);  // Checks every 100ms
+  }, 100);
 }
 
 
