@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-  var tabUrl;
+  let tabUrl;
   try {
     tabUrl = decodeURIComponent(changeInfo.url);
   }

@@ -1,20 +1,20 @@
-function saveToLocalStorage(key, value, callback) {
+const TAB_WILDCARD_CHATGPT = 'https://chat.openai.com/*';
+
+function saveToLocalStorage(key, value) {
   localStorage.setItem('lh-' + key, JSON.stringify(value));
 }
 
 
-function getFromLocalStorage(key, callback){
+function getFromLocalStorage(key){
   try {
     return JSON.parse(localStorage.getItem('lh-' + key));
   }
-  catch (e) {
-    return;
-  }
+  catch (e) {}
 }
 
 
 function copyToClipboard(value){
-  var clipboard = $('#lh-clipboard');
+  const clipboard = $('#lh-clipboard');
   clipboard.val(value);
   clipboard.select();
   document.execCommand('copy');
@@ -47,7 +47,7 @@ function saveSettings(){
   saveToLocalStorage('settings-emails', emails);
 
   if (prompts.length) {
-    sendMessageToChatGPTTab('saveChatGPTPrompts', { prompts }, response => {
+    sendMessageToTab(TAB_WILDCARD_CHATGPT, 'saveChatGPTPrompts', { prompts }, response => {
       if (response.error) {
         alert('CAN\'T SAVE CHATGPT PROMPTS. OPEN HTTPS://CHAT.OPENAI.COM/CHAT AND TRY AGAIN');
       }
@@ -74,7 +74,7 @@ function restoreSettingsFormPrompts(prompts){
   if (prompts?.length) {
     promptsTextarea.val(prompts.join('\n\n'));
   }
-  else if (prompts.error) {
+  else if (prompts?.error) {
     promptsTextarea
       .attr({ disabled: true })
       .val('OPEN HTTPS://CHAT.OPENAI.COM/CHAT AND TRY AGAIN');
@@ -140,9 +140,8 @@ function getURLBasedKeyword(callback){
   });
 }
 
-
-function sendMessageToChatGPTTab(messageType, data, callback){
-  chrome.tabs.query({ url: 'https://chat.openai.com/*' }, tabs => {
+function sendMessageToTab(urlWildcard, messageType, data, callback){
+  chrome.tabs.query({ url: urlWildcard }, tabs => {
     const messageOptions = {
       action: messageType,
       data,
@@ -156,11 +155,10 @@ function sendMessageToChatGPTTab(messageType, data, callback){
   });
 }
 
-
 renderEmailToCopyList(initEmailToCopyEvents);
 restoreSettingsFormEmails();
 
-sendMessageToChatGPTTab('getChatGPTPrompts', null, response => {
+sendMessageToTab(TAB_WILDCARD_CHATGPT , 'getChatGPTPrompts', null, response => {
   restoreSettingsFormPrompts(response);
 });
 

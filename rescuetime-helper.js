@@ -23,22 +23,22 @@ function appendGlobalStyles(){
 
 
 function getNewLinkElementsArray(){
-  var selector = '.report-table a[href^="https://www.rescuetime.com/browse/activities/"]:not(.lh-patched)';
+  const selector = '.report-table a[href^="https://www.rescuetime.com/browse/activities/"]:not(.lh-patched)';
   return Array.prototype.slice.apply(document.querySelectorAll(selector));
 }
 
 
 function createElement(tagName, attributes) {
-  var el = document.createElement(tagName);
-  for (var key in attributes) {
-    el[key] = attributes[key];
+  const element = document.createElement(tagName);
+  for (const key in attributes) {
+    element[key] = attributes[key];
   }
-  return el;
+  return element;
 }
 
 
 function createBrowserHistoryLinkElement(domain){
-  var browserHistoryLinkElement = createElement('a', {
+  const browserHistoryLinkElement = createElement('a', {
     target: '_blank',
     href: `chrome://history/?q=${domain}`,
     innerText: 'Browser',
@@ -78,25 +78,25 @@ function insetAfter(referenceElement, newElement){
 
 
 function patchNewsLinks(linkElements){
-  linkElements.forEach(function(el){
-    domain = el.innerText;
-    el.href = el.href
+  linkElements.forEach((element) => {
+    const domain = element.innerText;
+    element.href = element.href
       .replace(/by\/day\/for/, 'by/rank/for')
       .replace(/by\/hour\/for/, 'by/rank/for');
-    insetAfter(el, createGoogleHistoryLinkElement(domain));
-    insetAfter(el, createBrowserHistoryLinkElement(domain));
-    insetAfter(el, createOpenLinkElement(domain));
-    el.classList.add('lh-patched');
+    insetAfter(element, createGoogleHistoryLinkElement(domain));
+    insetAfter(element, createBrowserHistoryLinkElement(domain));
+    insetAfter(element, createOpenLinkElement(domain));
+    element.classList.add('lh-patched');
   });
 }
 
 
 function enableGoogleSearchLinks(){
   $('.report-table-primary-field').toArray().forEach(item => {
-    var rawText = $(item).text().trim();
-    var linkText;
-    var linkUrl;
-    var searchTerm;
+    const rawText = $(item).text().trim();
+    let linkText;
+    let linkUrl;
+    let searchTerm;
 
     if (rawText.indexOf('- Google Search') > -1) {
       linkUrl = 'https://www.google.com/search?q=';
@@ -116,8 +116,8 @@ function enableGoogleSearchLinks(){
 
 
 function initializeNeutralItemsSwitch(){
-  $('.report-table-meta .bulk-select-label').on('click', function(e){
-    setTimeout(function(){
+  $('.report-table-meta .bulk-select-label').on('click', () => {
+    setTimeout(() => {
       $('#bulk-update-cancel-link').append(`
         | <a id="lh-show-neutral" href="#" style="color: #8b9695">show neutral only</a>
       `);
@@ -128,8 +128,8 @@ function initializeNeutralItemsSwitch(){
       }
 
       $('#lh-show-neutral').on('click', function(e){
-        $('.report-table tr').filter(function(i, el){
-          return !$(el).find('.productivity-link.score0').length;
+        $('.report-table tr').filter((i, element) => {
+          return !$(element).find('.productivity-link.score0').length;
         }).hide();
         e.preventDefault();
       });
@@ -143,37 +143,37 @@ function toggleHidden(){
   $('#hidden-rows-toggle').hide();
 }
 
-
 function appendCalcProductivityButton(){
-  var button = $('<div><button id="calc_productivity">Calc productivity</button></div>')
+  const button = $('<div><button id="calc_productivity">Calc productivity</button></div>')
     .find('button')
     .css({
       padding: '2px 7px 1px 7px',
       margin: '-2px 0 0 3px',
     })
     .end();
+
   $('.productivity-arc-comparison').append(button);
   $('#summary-info-panels .row .large-12.small-12.columns').css('paddingTop', '20px');
+
   button.on('click', function(){
-    var params = getProductivityParams();
-    var paramsArr = [];
-    for (var key in params) {
+    const params = getProductivityParams();
+    const paramsArr = [];
+    for (const key in params) {
       paramsArr.push(`${key}=${params[key]}`);
     }
-    var url = `https://productivity-tool.surge.sh?${paramsArr.join('&')}`;
+    const url = `https://productivity-tool.surge.sh?${paramsArr.join('&')}`;
     window.open(url);
   });
 }
 
 function getProductivityParams(){
-  var jsCode = $('#rtdata_json').html().replace('//<![CDATA[', '').replace('//]]>', '');
-  eval(jsCode);
+  const { productivity_arc } = extractRescueTimeChartData();
 
-  var productive = RTDATA.chart_data.productivity_arc.filter(a => a.name === 'Productive')[0].duration / 60 / 60
-    + RTDATA.chart_data.productivity_arc.filter(a => a.name === 'Very Productive')[0].duration / 60 / 60;
+  const productive = productivity_arc.filter(a => a.name === 'Productive')[0].duration / 60 / 60
+    + productivity_arc.filter(a => a.name === 'Very Productive')[0].duration / 60 / 60;
 
-  var distracting = RTDATA.chart_data.productivity_arc.filter(a => a.name === 'Distracting')[0].duration / 60 / 60
-    + RTDATA.chart_data.productivity_arc.filter(a => a.name === 'Very Distracting')[0].duration / 60 / 60;
+  const distracting = productivity_arc.filter(a => a.name === 'Distracting')[0].duration / 60 / 60
+    + productivity_arc.filter(a => a.name === 'Very Distracting')[0].duration / 60 / 60;
 
   return {
     desiredProductivity: 70,
@@ -184,19 +184,27 @@ function getProductivityParams(){
   };
 }
 
+function extractRescueTimeChartData() {
+  const rawString = $('#rtdata_json')
+    .html()
+    .split('RTDATA.chart_data=')[1]
+    .split(';RTDATA.')[0];
+  return JSON.parse(rawString);
+}
+
 
 function initialize(){
   patchNewsLinks(getNewLinkElementsArray());
   initializeNeutralItemsSwitch();
   appendGlobalStyles();
-  setInterval(function(){
+  setInterval(() => {
     if (window.location.pathname.indexOf('/dashboard') === 0 && !$('#calc_productivity').length) {
       appendCalcProductivityButton();
     }
     if (window.location.pathname.indexOf('/browse/productivity') === 0) {
-      var newlinks = getNewLinkElementsArray();
-      if (newlinks.length) {
-        patchNewsLinks(newlinks);
+      const newLinks = getNewLinkElementsArray();
+      if (newLinks.length) {
+        patchNewsLinks(newLinks);
       }
     }
   }, 950);
