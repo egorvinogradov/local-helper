@@ -6,11 +6,18 @@ window.__currentFirstReplyText = '';
 function parseLocationSearch() {
   const params = {};
   const queryString = location.search.substring(1);
-  const pairs = queryString.split('&');
-  pairs.forEach(pair => {
-    const [key, value] = pair.split('=');
-    params[decodeURIComponent(key)] = decodeURIComponent(value);
-  });
+  if (queryString) {
+    const pairs = queryString.split('&');
+    pairs.forEach(pair => {
+      const [key, value] = pair.split('=');
+      if (key && !value) {
+        params[decodeURIComponent(key)] = true;
+      }
+      else {
+        params[decodeURIComponent(key)] = decodeURIComponent(value.replace(/\+/g, ' '));
+      }
+    });
+  }
   return params;
 }
 
@@ -22,6 +29,10 @@ function setTextareaFromGETParams() {
   }
   else if (prompt) {
     setTextareaText(prompt);
+  }
+
+  if (copilot || prompt) {
+    waitUntilTabFullyLoaded(triggerSubmit);
   }
 }
 
@@ -87,6 +98,10 @@ function setTextareaText(text){
   nativeInputValueSetter.call(textarea, text);
   textarea.dispatchEvent(event);
   setTimeout(() => textarea.focus(), 200);
+}
+
+function triggerSubmit() {
+  document.querySelector('button[data-testid="send-button"]').click();
 }
 
 
@@ -225,6 +240,17 @@ function initializePopupMessaging(){
       sendResponse(true);
     }
   });
+}
+
+function waitUntilTabFullyLoaded(callback) {
+  const interval = setInterval(() => {
+    const tabElement = document.querySelector('[data-testid="gpt-4"]')
+      || document.querySelector('[data-testid="text-davinci-002-render-sha"]');
+    if (tabElement) {
+      clearInterval(interval);
+      callback();
+    }
+  }, 100);  // Checks every 100ms
 }
 
 
