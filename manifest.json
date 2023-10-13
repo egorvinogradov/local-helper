@@ -48,6 +48,8 @@
     {
       "js": ["job-boards-helper.js"],
       "matches": [
+        "https://jobs.ashbyhq.com/*",
+        "https://apply.workable.com/*",
         "https://jobs.lever.co/*"
       ]
     }

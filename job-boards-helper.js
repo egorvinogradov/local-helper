@@ -24,6 +24,18 @@ const KEYWORDS_CASE_INSENSITIVE = [
   'portugal',
   'italy',
   'romania',
+  'brazil',
+  'mexico',
+
+  // Regions
+  'europe',
+  'latin',
+  'latam',
+  'asia',
+  'emea',
+  'america',
+  'americas',
+  'american',
 
   // Location
   'remote',
@@ -35,7 +47,9 @@ const KEYWORDS_CASE_INSENSITIVE = [
   'trip',
   'based',
   'location',
+  'locations',
   'global',
+  'region',
   'everywhere',
   'world',
   'city',
@@ -55,6 +69,8 @@ const KEYWORDS_CASE_INSENSITIVE = [
 
 const KEYWORDS_CASE_SENSITIVE = [
   'US',
+  'USA',
+  'EU',
 ];
 
 
@@ -66,28 +82,33 @@ function searchKeywords(list, isCaseSensitive) {
 
 
 function renderKeywordCounter(matches){
-  const counter = document.createElement('div');
+  let container = document.querySelector('#job-keywords');
+
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'job-keywords';
+    container.style = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100000;
+      font-size: 15px;
+      border: 1px solid red;
+      color: red;
+      line-height: 27px;
+      padding: 0 8px;
+      margin: 10px;
+      background: white;
+      user-select: none;
+    `;
+    document.body.appendChild(container);
+    requestAnimationFrame(attachKeywordMatchClickEvents);
+  }
+
   const matchesHTML = (matches || []).map(match => {
-    return `<u style="cursor: pointer" data-match=${match}>${preventWordFromBeingFound(match)}</u>`;
+    return `<u data-match=${match} style="cursor: pointer">${preventWordFromBeingFound(match)}</u>`;
   });
-  counter.innerHTML = matches.length ? matchesHTML.join(', ') : 'No matches';
-  counter.id = 'job-keywords';
-  counter.style = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100000;
-    font-size: 15px;
-    border: 1px solid red;
-    color: red;
-    line-height: 27px;
-    padding: 0 8px;
-    margin: 10px;
-    background: white;
-    user-select: none;
-  `;
-  document.body.appendChild(counter);
-  requestAnimationFrame(attachKeywordMatchClickEvents);
+  container.innerHTML = matches.length ? matchesHTML.join(', ') : 'No matches';
 }
 
 
@@ -97,7 +118,7 @@ function attachKeywordMatchClickEvents(){
       const { match } = e.target.dataset;
       const isCaseSensitive = KEYWORDS_CASE_SENSITIVE.includes(match);
       window.find(match, isCaseSensitive, false, true, true, true, true);
-      console.warn('Searching for', match, isCaseSensitive, window.TOTAL_MATCHES);
+      console.log('Searching for', match, isCaseSensitive, window.TOTAL_MATCHES);
     });
   });
 }
@@ -108,12 +129,20 @@ function preventWordFromBeingFound(word){
 }
 
 
-function initializeNewSearch(){
+function initializeSearch(){
   const caseInsensitiveMatches = searchKeywords(KEYWORDS_CASE_INSENSITIVE, false);
   const caseSensitiveMatches = searchKeywords(KEYWORDS_CASE_SENSITIVE, true);
+  const totalMatches = [...caseInsensitiveMatches, ...caseSensitiveMatches];
 
-  window.TOTAL_MATCHES = [...caseInsensitiveMatches, ...caseSensitiveMatches];
-  renderKeywordCounter(window.TOTAL_MATCHES);
+  if (!totalMatches.length) {
+    console.log('No matches found, retrying...');
+    setTimeout(initializeSearch, 500);
+  }
+  else {
+    console.log('Found matching keywords', totalMatches);
+    window.TOTAL_MATCHES = totalMatches;
+    renderKeywordCounter(totalMatches);
+  }
 }
 
 
@@ -137,19 +166,24 @@ function renderRedirectToJobDescriptionButton(){
     left: 0;
     z-index: 100000;
     font-size: 15px;
-    border: 1px solid red;
-    color: red;
+    border: 1px solid gray;
+    color: gray;
     line-height: 27px;
     padding: 0 8px;
     margin: 10px;
     background: white;
+    cursor: not-allowed;
   `;
-  button.textContent = descriptionPath ? 'See Job Description' : 'No job description found';
+  button.textContent = descriptionPath ? 'Open Job Description [↗]' : 'Job Description: N/A';
   document.body.appendChild(button);
 
   if (descriptionPath) {
+    button.style.border = '1px solid red';
+    button.style.color = 'red';
+    button.style.cursor = 'pointer';
+
     button.addEventListener('click', () => {
-      location.pathname = descriptionPath;
+      window.open(location.protocol + '//' + location.host + descriptionPath);
     });
   }
 }
@@ -157,18 +191,21 @@ function renderRedirectToJobDescriptionButton(){
 
 function getJobDescriptionPath(){
   const descriptionPaths = {
-    lever: () => {
-      return location.pathname.split('/apply')[0];
-    },
+    'jobs.lever.co': () => location.pathname.split('/apply')[0],
+    'apply.workable.com': () => location.pathname.split('/apply')[0],
+    'jobs.ashbyhq.com': () => location.pathname.split('/application')[0],
   };
-  if (location.hostname === 'jobs.lever.co') {
-    return descriptionPaths.lever();
+
+  if (descriptionPaths[location.hostname]) {
+    const descriptionPath = descriptionPaths[location.hostname]();
+    const isAlreadySeeingDescription = descriptionPath === location.pathname;
+    return isAlreadySeeingDescription ? null : descriptionPath;
   }
 }
 
 
 detectJobPosting(() => {
   console.log('Detected job posting');
-  initializeNewSearch();
   renderRedirectToJobDescriptionButton();
+  initializeSearch();
 });
