@@ -1,9 +1,7 @@
 const KEYWORDS_CASE_INSENSITIVE = [
 
   // Countries
-  'united states',
   'canada',
-  'united kingdom',
   'germany',
   'netherlands',
   'sweden',
@@ -19,13 +17,16 @@ const KEYWORDS_CASE_INSENSITIVE = [
   'austria',
   'estonia',
   'poland',
-  'czech republic',
+  'czech',
   'ukraine',
   'portugal',
   'italy',
   'romania',
   'brazil',
   'mexico',
+  'india',
+  'china',
+  'taiwan',
 
   // Regions
   'europe',
@@ -33,6 +34,7 @@ const KEYWORDS_CASE_INSENSITIVE = [
   'latam',
   'asia',
   'emea',
+  'apac',
   'america',
   'americas',
   'american',
@@ -40,7 +42,6 @@ const KEYWORDS_CASE_INSENSITIVE = [
   // Location
   'remote',
   'timezone',
-  'time zone',
   'office',
   'hybrid',
   'travel',
@@ -51,20 +52,35 @@ const KEYWORDS_CASE_INSENSITIVE = [
   'global',
   'region',
   'everywhere',
+  'anywhere',
   'world',
   'city',
-  
+  'country',
+  'authorized',
+  'authorization',
+  'clearance',
+  'resident',
+  'residency',
+  'visa',
+  'permit',
+  'permission',
+  'legal',
+  'legally',
+  'outside',
+
   // Salary
   'range',
   'rate',
   'wage',
   'salary',
   'expectation',
-  '$',
-  'usd',
-  'eur',
+  'expectations',
   'pay',
-  '€',
+  'compensation',
+  'equity',
+  'shares',
+  'stock',
+  'options',
 ];
 
 const KEYWORDS_CASE_SENSITIVE = [
@@ -73,13 +89,29 @@ const KEYWORDS_CASE_SENSITIVE = [
   'EU',
 ];
 
+const KEYWORDS_PARTIAL = [
+  '$',
+  '€',
+  'usd',
+  'eur',
+  'U.S.',
+  'E.U.',
+  'time zone',
+  'united states',
+  'united kingdom',
+];
 
-function searchKeywords(list, isCaseSensitive) {
+
+function searchKeywords(list, options) {
   return list.filter(keyword => {
-    return window.find(keyword, isCaseSensitive, false, true, true, true, true);
+    return findSingleKeyword(keyword, options);
   });
 }
 
+function findSingleKeyword(keyword, options) {
+  const { isCaseSensitive, isPartialMatch } = options || {};
+  return window.find(keyword, isCaseSensitive, false, true, !isPartialMatch, true, true);
+}
 
 function renderKeywordCounter(matches){
   let container = document.querySelector('#job-keywords');
@@ -88,14 +120,13 @@ function renderKeywordCounter(matches){
     container = document.createElement('div');
     container.id = 'job-keywords';
     container.style = `
+      font: normal normal 15px/27px 'Arial', sans-serif;
       position: fixed;
       top: 0;
       left: 0;
       z-index: 100000;
-      font-size: 15px;
       border: 1px solid red;
       color: red;
-      line-height: 27px;
       padding: 0 8px;
       margin: 10px;
       background: white;
@@ -117,8 +148,14 @@ function attachKeywordMatchClickEvents(){
     clickableWord.addEventListener('mousedown', e => {
       const { match } = e.target.dataset;
       const isCaseSensitive = KEYWORDS_CASE_SENSITIVE.includes(match);
-      window.find(match, isCaseSensitive, false, true, true, true, true);
-      console.log('Searching for', match, isCaseSensitive, window.TOTAL_MATCHES);
+      const isPartialMatch = KEYWORDS_PARTIAL.includes(match);
+      findSingleKeyword(match, { isCaseSensitive, isPartialMatch });
+
+      console.log('Searching for', match, {
+        isCaseSensitive,
+        isPartialMatch,
+        totalMatches: window.TOTAL_MATCHES,
+      });
     });
   });
 }
@@ -130,9 +167,10 @@ function preventWordFromBeingFound(word){
 
 
 function initializeSearch(){
-  const caseInsensitiveMatches = searchKeywords(KEYWORDS_CASE_INSENSITIVE, false);
-  const caseSensitiveMatches = searchKeywords(KEYWORDS_CASE_SENSITIVE, true);
-  const totalMatches = [...caseInsensitiveMatches, ...caseSensitiveMatches];
+  const caseInsensitiveMatches = searchKeywords(KEYWORDS_CASE_INSENSITIVE);
+  const caseSensitiveMatches = searchKeywords(KEYWORDS_CASE_SENSITIVE, { isCaseSensitive: true });
+  const partialWordMatches = searchKeywords(KEYWORDS_PARTIAL, { isPartialMatch: true });
+  const totalMatches = [...caseInsensitiveMatches, ...caseSensitiveMatches, ...partialWordMatches];
 
   if (!totalMatches.length) {
     console.log('No matches found, retrying...');
@@ -146,29 +184,17 @@ function initializeSearch(){
 }
 
 
-function detectJobPosting(callback){
-  const interval = setInterval(() => {
-    const simplifyJobsContainer = document.querySelector('#simplifyJobsContainer');
-    if (simplifyJobsContainer) {
-      clearInterval(interval);
-      callback();
-    }
-  }, 100);
-}
-
-
 function renderRedirectToJobDescriptionButton(){
   const descriptionPath = getJobDescriptionPath();
   const button = document.createElement('button');
   button.style = `
+    font: normal normal 15px/27px 'Arial', sans-serif;
     position: fixed;
     top: 39px;
     left: 0;
     z-index: 100000;
-    font-size: 15px;
     border: 1px solid gray;
     color: gray;
-    line-height: 27px;
     padding: 0 8px;
     margin: 10px;
     background: white;
@@ -194,6 +220,7 @@ function getJobDescriptionPath(){
     'jobs.lever.co': () => location.pathname.split('/apply')[0],
     'apply.workable.com': () => location.pathname.split('/apply')[0],
     'jobs.ashbyhq.com': () => location.pathname.split('/application')[0],
+    'jobs.jobvite.com': () => location.pathname.split('/apply')[0],
   };
 
   if (descriptionPaths[location.hostname]) {
@@ -203,9 +230,28 @@ function getJobDescriptionPath(){
   }
 }
 
+function isJobWebsite(){
+  const jobBoards = [
+    'jobs.jobvite.com',
+    'boards.greenhouse.io',
+    'jobs.ashbyhq.com',
+    'apply.workable.com',
+    'jobs.lever.co'
+  ];
+  if (jobBoards.includes(location.hostname)) {
+    return true;
+  }
+  else if (/\/(career|job|vacanc|position)/i.test(location.pathname)) {
+    return true;
+  }
+  else if (/^(career|job|vacanc|position)/i.test(location.hostname)) {
+    return true;
+  }
+  return false;
+}
 
-detectJobPosting(() => {
-  console.log('Detected job posting');
+
+if (isJobWebsite()) {
   renderRedirectToJobDescriptionButton();
   initializeSearch();
-});
+}
