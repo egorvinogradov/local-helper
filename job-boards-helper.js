@@ -221,6 +221,15 @@ function getJobDescriptionPath(){
     'apply.workable.com': () => location.pathname.split('/apply')[0],
     'jobs.ashbyhq.com': () => location.pathname.split('/application')[0],
     'jobs.jobvite.com': () => location.pathname.split('/apply')[0],
+    'boards.greenhouse.io': () => {
+      if (location.pathname.includes('/jobs/')) {
+        const jobPostingTitle = document.querySelector('meta[property="og:title"]').content;
+        return location.pathname.split('/jobs/')[0]
+          + '#:~:text='
+          + encodeURIComponent(jobPostingTitle).replace(/-/ig, '%2D');
+      }
+      return null;
+    },
   };
 
   if (descriptionPaths[location.hostname]) {
@@ -238,6 +247,10 @@ function isJobWebsite(){
     'apply.workable.com',
     'jobs.lever.co'
   ];
+  const exclusionList = ['simplify.jobs'];
+  if (exclusionList.includes(location.hostname)) {
+    return false;
+  }
   if (jobBoards.includes(location.hostname)) {
     return true;
   }
@@ -251,7 +264,16 @@ function isJobWebsite(){
 }
 
 
+function shouldInitializeKeywordSearch(callback) {
+  const isGreenhouseRootPage = location.hostname === 'boards.greenhouse.io'
+    && location.pathname.split('/').filter((chunk) => chunk).length === 1;
+  if (!isGreenhouseRootPage) {
+    callback();
+  }
+}
+
+
 if (isJobWebsite()) {
   renderRedirectToJobDescriptionButton();
-  initializeSearch();
+  shouldInitializeKeywordSearch(initializeSearch);
 }
