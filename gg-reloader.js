@@ -2,19 +2,47 @@
  * Automatically reloads http://e.ggtimer.com/ when time is expired
  */
 
-const mainInterval = setInterval(function() {
-  var progressBar = document.getElementsByClassName('ClassicTimer-time')[0];
-  if (progressBar && /time expired/i.test( progressBar.innerText.toLowerCase() )) {
-    clearInterval(mainInterval);
-    setTimeout(function() {
-      showPopup();
-      location.reload();
-    }, 3000);
-  }
-}, 1000);
+function getPopupMessage() {
+  const regex = /(\d+)\s*(h|hour|hours|m|min|mins|minutes|s|sec|seconds)/i;
+  const match = location.pathname.replace(/^\//, '').match(regex);
+  let normalizedDurationString = '';
 
+  if (match) {
+    const [, value, unit] = match;
+    const lowerUnit = unit.toLowerCase();
+
+    if (['h', 'hour', 'hours'].includes(lowerUnit)) {
+      normalizedDurationString = `${value} hour${value > 1 ? 's are up' : ' is up'}`;
+    } else if (['m', 'min', 'mins', 'minutes'].includes(lowerUnit)) {
+      normalizedDurationString = `${value} minute${value > 1 ? 's are up' : ' is up'}`;
+    } else if (['s', 'sec', 'seconds'].includes(lowerUnit)) {
+      normalizedDurationString = `${value} second${value > 1 ? 's are up' : ' is up'}`;
+    }
+  }
+  return normalizedDurationString || 'Time\'s up';
+}
+
+
+function watchTimer(onExpired) {
+  const mainInterval = setInterval(() => {
+    if (isExpired()) {
+      clearInterval(mainInterval);
+      onExpired();
+    }
+  }, 1000);
+}
+
+function isExpired() {
+  const progressBar = document.getElementsByClassName('ClassicTimer-time')[0];
+  return progressBar && /time expired/i.test(progressBar.innerText.toLowerCase());
+}
+
+function restartTimer() {
+  document.querySelector('button[title="Restart timer"]').click();
+}
 
 function showPopup(){
+  const popupMessage = getPopupMessage();
   const popupHTML = `<html>
     <body>
     <style>
@@ -34,12 +62,12 @@ function showPopup(){
         margin: 0;
       }
     </style>
-    <h2>Time's up</h2>
+    <h2>${popupMessage}</h2>
     </body>
   </html>
   `;
-  const popupWidth = 600;
-  const popupHeight = 350;
+  const popupWidth = 980;
+  const popupHeight = 390;
   const popupOptions = `
     toolbar=no,
     location=no,
@@ -55,3 +83,13 @@ function showPopup(){
   const popup = window.open('', 'popup', popupOptions);
   popup.document.write(popupHTML);
 }
+
+function initialize(){
+  watchTimer(() => {
+    showPopup();
+    restartTimer();
+    initialize();
+  });
+}
+
+initialize();

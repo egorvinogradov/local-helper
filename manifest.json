@@ -7,7 +7,7 @@
     },
     {
       "js": ["gg-reloader.js"],
-      "matches": ["http://e.ggtimer.com/*"]
+      "matches": ["https://e.ggtimer.com/*"]
     },
     {
       "js": ["google-redirect.js"],
