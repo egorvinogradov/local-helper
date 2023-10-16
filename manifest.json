@@ -46,6 +46,10 @@
       "matches": ["https://chat.openai.com/*"]
     },
     {
+      "js": ["simplify-jobs-add-job.js"],
+      "matches": ["https://simplify.jobs/applications*"]
+    },
+    {
       "js": ["job-boards-helper.js"],
       "matches": ["<all_urls>"]
     }

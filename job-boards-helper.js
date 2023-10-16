@@ -30,9 +30,11 @@ const KEYWORDS_CASE_INSENSITIVE = [
 
   // Regions
   'europe',
+  'european',
   'latin',
   'latam',
   'asia',
+  'asian',
   'emea',
   'apac',
   'america',
@@ -41,16 +43,21 @@ const KEYWORDS_CASE_INSENSITIVE = [
 
   // Location
   'remote',
+  'distributed',
   'timezone',
+  'utc',
+  'gmt',
   'office',
   'hybrid',
   'travel',
   'trip',
   'based',
+  'located',
   'location',
   'locations',
   'global',
   'region',
+  'regions',
   'everywhere',
   'anywhere',
   'world',
@@ -86,6 +93,7 @@ const KEYWORDS_CASE_INSENSITIVE = [
 const KEYWORDS_CASE_SENSITIVE = [
   'US',
   'USA',
+  'UK',
   'EU',
 ];
 
@@ -124,7 +132,7 @@ function renderKeywordCounter(matches){
       position: fixed;
       top: 0;
       left: 0;
-      z-index: 100000;
+      z-index: 10000000;
       border: 1px solid red;
       color: red;
       padding: 0 8px;
@@ -192,7 +200,7 @@ function renderRedirectToJobDescriptionButton(){
     position: fixed;
     top: 39px;
     left: 0;
-    z-index: 100000;
+    z-index: 10000000;
     border: 1px solid gray;
     color: gray;
     padding: 0 8px;
@@ -223,12 +231,13 @@ function getJobDescriptionPath(){
     'jobs.jobvite.com': () => location.pathname.split('/apply')[0],
     'boards.greenhouse.io': () => {
       if (location.pathname.includes('/jobs/')) {
-        const jobPostingTitle = document.querySelector('meta[property="og:title"]').content;
-        return location.pathname.split('/jobs/')[0]
-          + '#:~:text='
-          + encodeURIComponent(jobPostingTitle).replace(/-/ig, '%2D');
+        const jobPostingTitle = document.querySelector('meta[property="og:title"]')?.content;
+        if (jobPostingTitle) {
+          return location.pathname.split('/jobs/')[0]
+            + '#:~:text='
+            + encodeURIComponent(jobPostingTitle).replace(/-/ig, '%2D');
+        }
       }
-      return null;
     },
   };
 
@@ -245,16 +254,19 @@ function isJobWebsite(){
     'boards.greenhouse.io',
     'jobs.ashbyhq.com',
     'apply.workable.com',
-    'jobs.lever.co'
+    'jobs.lever.co',
+    'recruitee.com',
+    'weworkremotely.com/remote-jobs',
+    'remoteok.com/remote-jobs/',
   ];
   const exclusionList = ['simplify.jobs'];
-  if (exclusionList.includes(location.hostname)) {
+  if (exclusionList.find(host => location.href.includes(host))) {
     return false;
   }
-  if (jobBoards.includes(location.hostname)) {
+  if (jobBoards.find(host => location.href.includes(host))) {
     return true;
   }
-  else if (/\/(career|job|vacanc|position)/i.test(location.pathname)) {
+  else if (/\/(career|job|vacanc|position|life-at-|team)/i.test(location.pathname)) {
     return true;
   }
   else if (/^(career|job|vacanc|position)/i.test(location.hostname)) {
@@ -267,13 +279,60 @@ function isJobWebsite(){
 function shouldInitializeKeywordSearch(callback) {
   const isGreenhouseRootPage = location.hostname === 'boards.greenhouse.io'
     && location.pathname.split('/').filter((chunk) => chunk).length === 1;
+
   if (!isGreenhouseRootPage) {
     callback();
   }
 }
 
 
+function removeRedundantKeywordsFromDOM() {
+  const rulesByWebsite = {
+    'www.workingnomads.com': () => {
+      const footer = document.getElementById('page-footer');
+      footer.parentElement.removeChild(footer);
+    },
+    'remoteok.com/remote-jobs/': () => {
+      const selectors = [
+        'footer',
+        '.preload',
+        '.backdrop',
+        '.spinner',
+        '.loading_spinner',
+        '.infinity-scroll',
+        '.matching_user_cards',
+        '.td-related-jobs',
+      ];
+      document.querySelectorAll(selectors.join(',')).forEach(block => {
+        block.parentElement.removeChild(block);
+      });
+      const style = document.createElement('style');
+      style.innerHTML = `
+        tr[data-url^="/remote-jobs/"]:not(.active),
+        tr[data-url^="/remote-jobs/"]:not(.active) + .expand,
+        tr[data-url^="/remote-jobs/"]:not(.active) + .expand + .divider {
+          display: none;
+        }
+        .expandContents {
+          margin-bottom: 1000px;
+        }
+      `;
+      document.head.appendChild(style);
+    },
+  };
+  const matchingRuleKey = Object.keys(rulesByWebsite).find(urlPattern => location.href.includes(urlPattern));
+  if (matchingRuleKey) {
+    rulesByWebsite[matchingRuleKey]();
+  }
+}
+
+
 if (isJobWebsite()) {
+  console.log('✅ Detected job website');
   renderRedirectToJobDescriptionButton();
-  shouldInitializeKeywordSearch(initializeSearch);
+  shouldInitializeKeywordSearch(() => {
+    console.log('✅ Initializing keyword search...');
+    removeRedundantKeywordsFromDOM();
+    initializeSearch();
+  });
 }
