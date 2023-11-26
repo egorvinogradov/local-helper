@@ -1,3 +1,5 @@
+const RESUME_ID = '3f96d9cf-0283-40ec-ad32-a1a1376bf821';
+
 function getCookie(name) {
   const cookies = document.cookie.split('; ');
   for (let i = 0; i < cookies.length; i++) {
@@ -38,7 +40,7 @@ function submitApplication(jobTitle, companyId){
     job_title: jobTitle,
     location: 'Remote',
     job_type: 2,
-    resume_id: '3f96d9cf-0283-40ec-ad32-a1a1376bf821',
+    resume_id: RESUME_ID,
   });
 }
 
@@ -52,14 +54,13 @@ function addNotesToApplication(application, notes){
 }
 
 function addJob(jobTitle, companyName, notes){
-  return createCompany(companyName).then(companyId => {
-    return submitApplication(jobTitle, companyId).then(application => {
-      return addNotesToApplication(application, notes).then(updatedApplication => {
-        console.log('Created application:', updatedApplication);
-        window.__application = updatedApplication;
-      });
+  return createCompany(companyName)
+    .then(companyId => submitApplication(jobTitle, companyId))
+    .then(application => addNotesToApplication(application, notes))
+    .then(applicationWithNotes => {
+      console.log('Created application:', applicationWithNotes);
+      window.__application = applicationWithNotes;
     });
-  });
 }
 
 function createInputPane() {
@@ -141,8 +142,9 @@ function onInputPaneSubmit() {
   const paneElement = document.querySelector('.local-helper-pane');
   const textareaElement = document.querySelector('.local-helper-pane-textarea');
 
-  const rows = textareaElement.value.trim().split(/\n/).filter(row => row.trim());
+  const rows = textareaElement.value.trim().split(/\n/).map(row => row.trim()).filter(row => row);
   const [ jobTitle, companyName, ...notes ] = rows;
+
   console.log('Submitting...', {
     jobTitle,
     companyName,
@@ -151,18 +153,19 @@ function onInputPaneSubmit() {
   });
 
   paneElement.classList.add('m-submitting');
+
   addJob(jobTitle, companyName, notes.join('\n\n'))
     .then(() => {
       paneElement.classList.add('m-success');
-      setTimeout(() => { paneElement.classList.remove('m-success'); }, 1500);
+      setTimeout(() => {
+        paneElement.classList.remove('m-success', 'm-submitting');
+      }, 1500);
       textareaElement.value = '';
     })
     .catch((e) => {
+      paneElement.classList.remove('m-submitting');
       alert('Error (see window.__error): ' + e.message);
       window.__error = e;
-    })
-    .finally(() => {
-      paneElement.classList.remove('m-submitting');
     });
 }
 
