@@ -24,6 +24,7 @@ function copyToClipboard(value){
 function parseSettingsForm(){
   const emailsTextarea = $('#b-settings-emails');
   const promptsTextarea = $('#b-settings-chatgpt-prompts');
+  const chatGPTKeyInput = $('#b-settings-chatgpt-api-key');
 
   const emails = emailsTextarea.val().trim().split(/\n/);
 
@@ -36,15 +37,18 @@ function parseSettingsForm(){
       .filter(str => str.trim());
   }
 
-  return { prompts, emails };
+  const chatGPTAPIKey = chatGPTKeyInput.val().trim();
+
+  return { prompts, emails, chatGPTAPIKey };
 }
 
 
 function saveSettings(){
   const saveButton = $('#b-settings-save');
-  const { emails, prompts } = parseSettingsForm();
+  const { emails, prompts, chatGPTAPIKey } = parseSettingsForm();
 
   saveToLocalStorage('settings-emails', emails);
+  saveToLocalStorage('settings-chat-key', chatGPTAPIKey);
 
   if (prompts.length) {
     sendMessageToTab(TAB_WILDCARD_CHATGPT, 'saveChatGPTPrompts', { prompts }, response => {
@@ -62,9 +66,11 @@ function saveSettings(){
 }
 
 
-function restoreSettingsFormEmails(){
+function restoreSettingsForm(){
   const emails = getFromLocalStorage('settings-emails') || [];
+  const chatGPTAPIKey = getFromLocalStorage('settings-chat-key') || '';
   $('#b-settings-emails').val(emails.join('\n'));
+  $('#b-settings-chatgpt-api-key').val(chatGPTAPIKey);
 }
 
 
@@ -140,6 +146,7 @@ function getURLBasedKeyword(callback){
   });
 }
 
+
 function sendMessageToTab(urlWildcard, messageType, data, callback){
   chrome.tabs.query({ url: urlWildcard }, tabs => {
     const messageOptions = {
@@ -155,11 +162,119 @@ function sendMessageToTab(urlWildcard, messageType, data, callback){
   });
 }
 
+
+function getSelectedTextInCurrentTab(callback){
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { method: 'getSelectedText' }, (response) => {
+      const selectedText = (response?.data || '').trim();
+      if (selectedText){
+        callback(selectedText);
+      }
+    });
+  });
+}
+
+
+function askChatGPT(question, apiKey) {
+  const messages = question instanceof Array
+    ? question
+    : [{ role: 'user', content: question }];
+
+  return fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + apiKey,
+    },
+    body: JSON.stringify({ model: 'gpt-4', messages })
+  }).then(res => res.json())
+}
+
+
+function extractChatGPTResponseText(response){
+  try {
+    const rawText = response.choices[0].message.content.trim() || '';
+    const textWithoutWrappingQuotes = rawText.replace(/^"/, '').replace(/"$/, '').trim();
+    return textWithoutWrappingQuotes.includes('"') ? rawText : textWithoutWrappingQuotes;
+  }
+  catch(e) {
+    showChatGPTError('Error while parsing ChatGPT response', { e, response });
+  }
+}
+
+
+function showChatGPTError(message, data){
+  const fullMessage = message + '. See window.__chatGPTError in console.';
+  window.__chatGPTError = data;
+  console.error(window.__chatGPTError);
+  alert(fullMessage);
+  throw fullMessage;
+}
+
+
+function initializeChatGPTTranslation(selectedText){
+  const API_KEY = $('#b-settings-chatgpt-api-key').val();
+  const TRANSLATE_PROMPT = `Translate the following word or phrase to Russian (if it's already in Russian then translate to English) and return a translated string only, without any comments.`;
+  const TRANSLATE_MORE_PROMPT = 'Another variant';
+  const EXPLAIN_PROMPT = `Give a very short explanation in Russian of what the following word or phrase means and return the explanation only as a string, without any comments.`;
+
+  const translationTab = $('[data-toggle="tab"][href="#chatgpt"]');
+  const comment = $('.b-translation-comment');
+  const title = $('.b-translation-title');
+  const variants = $('.b-translation-variants');
+  const more = $('.b-translation-more');
+  const explain = $('.b-translation-explain');
+
+  translationTab.click();
+  comment.hide();
+  title.text(`Translating "${selectedText}"...`);
+  explain.removeClass('d-none');
+
+  const translationMessageHistory = [];
+  const initialPrompt = `${TRANSLATE_PROMPT}:\n"${selectedText}"`;
+  translationMessageHistory.push({ role: 'user', content: initialPrompt });
+
+  askChatGPT(initialPrompt, API_KEY).then(extractChatGPTResponseText).then(translation => {
+    translationMessageHistory.push({ role: 'assistant', content: translation });
+    title.html(`"${selectedText}" translation <a class="ml-1 fa fa-window-restore" href="https://translate.yandex.ru/?text=${selectedText}" target="_blank"></a>`);
+    variants.append(`<li>${translation} <i class="fa"></i></li>`);
+    more.removeClass('d-none');
+  });
+
+  more.on('click', () => {
+    translationMessageHistory.push({ role: 'user', content: TRANSLATE_MORE_PROMPT });
+    more.text('More...').attr('disabled', true);
+
+    askChatGPT(translationMessageHistory, API_KEY).then(extractChatGPTResponseText).then(translation => {
+      translationMessageHistory.push({ role: 'assistant', content: translation });
+      variants.append(`<li>${translation}</li>`);
+      more.text('More').attr('disabled', false);
+    });
+  });
+
+  explain.on('click', () => {
+    const prompt = `${EXPLAIN_PROMPT}:\n"${selectedText}"`;
+    explain.text('Explain...').attr('disabled', true);
+
+    askChatGPT([{ role: 'user', content: prompt, }], API_KEY).then(extractChatGPTResponseText).then(explanation => {
+      variants.append(`<li>${explanation}</li>`);
+      explain.text('Explain').attr('disabled', false);
+    });
+  });
+}
+
+
 renderEmailToCopyList(initEmailToCopyEvents);
-restoreSettingsFormEmails();
+restoreSettingsForm();
 
 sendMessageToTab(TAB_WILDCARD_CHATGPT , 'getChatGPTPrompts', null, response => {
   restoreSettingsFormPrompts(response);
+});
+
+getSelectedTextInCurrentTab(selectedText => {
+  if (selectedText) {
+    initializeChatGPTTranslation(selectedText);
+  }
 });
 
 $('#b-settings-save').on('click', saveSettings);

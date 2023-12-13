@@ -2,10 +2,6 @@
   "name": "0 Local Helper",
   "content_scripts": [
     {
-      "js": ["libs/jquery.js"],
-      "matches": ["<all_urls>"]
-    },
-    {
       "js": ["gg-reloader.js"],
       "matches": ["https://e.ggtimer.com/*"]
     },
@@ -51,6 +47,10 @@
     },
     {
       "js": ["job-boards-helper.js"],
+      "matches": ["<all_urls>"]
+    },
+    {
+      "js": ["popup-to-dom-helper.js"],
       "matches": ["<all_urls>"]
     }
   ],

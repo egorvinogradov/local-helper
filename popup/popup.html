@@ -20,6 +20,12 @@
       </a>
     </li>
     <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#chatgpt">
+        <i class="fa fa-star"></i>
+        ChatGPT
+      </a>
+    </li>
+    <li class="nav-item">
       <a class="nav-link" data-toggle="tab" href="#settings">
         <i class="fa fa-cog"></i>
         Settings
@@ -34,6 +40,14 @@
       <textarea id="lh-clipboard" class="b-clipboard"></textarea>
     </div>
 
+    <div class="tab-pane show pt-3" id="chatgpt">
+      <div class="b-translation-comment">Select text on page and press Cmd+Shift+K to translate</div>
+      <p class="mb-2"><b class="b-translation-title"></b></p>
+      <ul class="b-translation-variants pl-4"></ul>
+      <button class="b-translation-more btn btn-primary d-none mr-2">More</button>
+      <button class="b-translation-explain btn btn-primary d-none">Explain</button>
+    </div>
+
     <div class="tab-pane pt-3" id="settings">
       <div class="form-group">
         <label>Emails:</label>
@@ -42,6 +56,10 @@
       <div class="form-group">
         <label>ChatGPT prompts:</label>
         <textarea class="form-control" rows="6" id="b-settings-chatgpt-prompts"></textarea>
+      </div>
+      <div class="form-group">
+        <label>ChatGPT API Key:</label>
+        <input class="form-control" id="b-settings-chatgpt-api-key"/>
       </div>
       <button class="btn btn-primary" id="b-settings-save">Save</button>
     </div>
