@@ -186,7 +186,7 @@ function askChatGPT(question, apiKey) {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + apiKey,
     },
-    body: JSON.stringify({ model: 'gpt-4', messages })
+    body: JSON.stringify({ model: 'gpt-4-1106-preview', messages })
   }).then(res => res.json())
 }
 
