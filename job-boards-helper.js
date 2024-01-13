@@ -327,12 +327,15 @@ function removeRedundantKeywordsFromDOM() {
 }
 
 
-if (isJobWebsite()) {
-  console.log('✅ Detected job website');
-  renderRedirectToJobDescriptionButton();
-  shouldInitializeKeywordSearch(() => {
-    console.log('✅ Initializing keyword search...');
-    removeRedundantKeywordsFromDOM();
-    initializeSearch();
-  });
-}
+
+// 🛑🛑🛑 DISABLING FOR NOW
+
+// if (isJobWebsite()) {
+//   console.log('✅ Detected job website');
+//   renderRedirectToJobDescriptionButton();
+//   shouldInitializeKeywordSearch(() => {
+//     console.log('✅ Initializing keyword search...');
+//     removeRedundantKeywordsFromDOM();
+//     initializeSearch();
+//   });
+// }
