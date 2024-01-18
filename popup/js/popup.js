@@ -176,6 +176,9 @@ function getSelectedTextInCurrentTab(callback){
 
 
 function askChatGPT(question, apiKey) {
+  const model = 'gpt-3.5-turbo-1106'; // faster
+  // const model = 'gpt-4-1106-preview';
+
   const messages = question instanceof Array
     ? question
     : [{ role: 'user', content: question }];
@@ -186,7 +189,7 @@ function askChatGPT(question, apiKey) {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + apiKey,
     },
-    body: JSON.stringify({ model: 'gpt-4-1106-preview', messages })
+    body: JSON.stringify({ model, messages })
   }).then(res => res.json())
 }
 
