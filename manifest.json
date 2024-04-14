@@ -38,12 +38,12 @@
       "matches": ["https://www.ivi.ru/*"]
     },
     {
-      "js": ["chat-gpt-utils.js"],
-      "matches": ["https://chat.openai.com/*"]
-    },
-    {
       "js": ["simplify-jobs-add-job.js"],
       "matches": ["https://simplify.jobs/applications*"]
+    },
+    {
+      "js": ["tgstat-extension.js"],
+      "matches": ["https://tgstat.com/*", "https://tgstat.ru/*", "https://uz.tgstat.com/*"]
     },
     {
       "js": ["job-boards-helper.js"],

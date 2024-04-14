@@ -1,3 +1,14 @@
+/*
+
+Temporarily disabled. To enable, add the following to "content_scripts" in manifest.json
+{
+  "js": ["chat-gpt-utils.js"],
+  "matches": ["https://chat.openai.com/*"]
+},
+
+*/
+
+
 window.__currentDropdownPrompt = '';
 window.__currentRepliesNumber = 0;
 window.__currentFirstReplyText = '';
