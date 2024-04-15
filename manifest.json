@@ -43,7 +43,15 @@
     },
     {
       "js": ["tgstat-extension.js"],
-      "matches": ["https://tgstat.com/*", "https://tgstat.ru/*", "https://uz.tgstat.com/*"]
+      "matches": [
+        "https://tgstat.com/*",
+        "https://tgstat.ru/*",
+        "https://uz.tgstat.com/*",
+        "https://kaz.tgstat.com/*",
+        "https://by.tgstat.com/*",
+        "https://kg.tgstat.com/*",
+        "https://uk.tgstat.com/*"
+      ]
     },
     {
       "js": ["job-boards-helper.js"],
