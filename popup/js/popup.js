@@ -92,15 +92,20 @@ function renderEmailToCopyList(callback){
   const emails = getFromLocalStorage('settings-emails') || [];
 
   getURLBasedKeyword(keyword => {
-    const emailsListHTML = emails.map(email => {
+    const emailsListHTML = emails.map((email, index) => {
       const emailWithKeyword = email.split('@')[0]
         + '+'
         + keyword
         + '@'
         + email.split('@')[1];
+      
+      const gmailLink = `https://mail.google.com/mail/u/${index}/`;
 
       return `
         <div class="text-nowrap mb-3">
+          <a href="${gmailLink}" target="_blank" class="btn btn-sm btn-outline-secondary mr-2" title="Open Gmail account">
+            <i class="fa fa-envelope"></i>
+          </a>
           <button
             class="b-emails-primary btn btn-outline-secondary"
             data-email="${email}">
